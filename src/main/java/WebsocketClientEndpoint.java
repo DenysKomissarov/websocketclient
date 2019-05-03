@@ -1,17 +1,20 @@
+import handlers.TestMessageHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.net.URI;
-import javax.websocket.ClientEndpoint;
-import javax.websocket.CloseReason;
-import javax.websocket.ContainerProvider;
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import javax.websocket.*;
 
 @ClientEndpoint
 public class WebsocketClientEndpoint {
     Session userSession = null;
-    private MessageHandler messageHandler;
+
+    private TestMessageHandler messageHandler;
+
+
+    @Autowired
+    public void setMessageHandler(TestMessageHandler messageHandler) {
+        this.messageHandler = messageHandler;
+    }
 
     public WebsocketClientEndpoint(URI endpointURI) {
         try {
@@ -62,7 +65,7 @@ public class WebsocketClientEndpoint {
      *
      * @param msgHandler
      */
-    public void addMessageHandler(MessageHandler msgHandler) {
+    public void addMessageHandler(TestMessageHandler msgHandler) {
         this.messageHandler = msgHandler;
     }
 
@@ -80,8 +83,8 @@ public class WebsocketClientEndpoint {
      *
      * @author Jiji_Sasidharan
      */
-    public static interface MessageHandler {
-
-        public void handleMessage(String message);
-    }
+//    public static interface MessageHandler {
+//
+//        public void handleMessage(String message);
+//    }
 }

@@ -1,21 +1,40 @@
+//import com.neovisionaries.ws.client.WebSocket;
+//import com.neovisionaries.ws.client.WebSocketAdapter;
+//import com.neovisionaries.ws.client.WebSocketException;
+//import com.neovisionaries.ws.client.WebSocketFactory;
+//
+//import java.io.IOException;
+//import java.net.URI;
+//import java.net.URISyntaxException;
+
+import entities.RequestMessage;
+import handlers.TestMessageHandler;
+import handlers.impls.MessageHandlerImpl;
+import messages.WebSocketMessages;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public class TestApp {
+    private final static String denisId = "bed819ac-efe7-4cee-93a4-2752b7c6687f";
+    private final static String eventId = "03c9ef1e-9e65-4dd3-8cdf-8e465992ebd4";
+
     public static void main(String[] args) {
+
         try {
             // open websocket
-            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("wss://real.okcoin.cn:10440/websocket/okcoinapi"));
+            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://localhost:8080/echo"));
+
+            TestMessageHandler messageHandler = new MessageHandlerImpl();
 
             // add listener
-            clientEndPoint.addMessageHandler(new WebsocketClientEndpoint.MessageHandler() {
-                public void handleMessage(String message) {
-                    System.out.println(message);
-                }
-            });
+            clientEndPoint.addMessageHandler(messageHandler);
 
             // send message to websocket
-            clientEndPoint.sendMessage("{'event':'addChannel','channel':'ok_btccny_ticker'}");
+            clientEndPoint.sendMessage("{\"route\":\"clientAuth\", \"userId\":\"bed819ac-efe7-4cee-93a4-2752b7c6687f\" , \"eventId\":\"03c9ef1e-9e65-4dd3-8cdf-8e465992ebd4\"}");
+
+            messageHandler.
+
 
             // wait 5 seconds for messages from websocket
             Thread.sleep(5000);
@@ -26,4 +45,5 @@ public class TestApp {
             System.err.println("URISyntaxException exception: " + ex.getMessage());
         }
     }
+
 }
