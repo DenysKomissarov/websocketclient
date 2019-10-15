@@ -4,7 +4,7 @@ public final class WebSocketMessages {
 
     public static final String pauseMessage = "{\"route\":\"clientStreamPause\", \"command\":\"send\", \"params\":{\"itemId\":\"a111111111111111111111111111111\"}}";
 
-    public static final String startMessage = "{\"route\":\"clientStreamStart\", \"command\":\"send\", \"params\":{\"itemId\":\"a111111111111111111111111111111\"}}"; // when player status pause
+    public static final String startMessage = "{\"route\":\"clientStreamStart\", \"command\":\"send\", \"params\":{\"itemId\":\"6b4e7544-7784-49a9-954a-33671566a894\"}}"; // when player status pause
 
     public static final String trackFromStartMessage = "{\"route\":\"clientTrackFromStart\", \"command\":\"send\", \"params\":{\"itemId\":\"a111111111111111111111111111111\"}}";
 
