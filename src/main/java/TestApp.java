@@ -30,7 +30,13 @@ public class TestApp {
 
 
 
-//        try {
+        try {
+
+
+
+
+
+
 //            // open websocket
 //            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://localhost:8080/echo"));
 //
@@ -47,12 +53,12 @@ public class TestApp {
 //            // wait 5 seconds for messages from websocket
 //            Thread.sleep(5000);
 //            clientEndPoint.sendMessage(WebSocketMessages.startMessage);
-//
-//        } catch (InterruptedException ex) {
-//            System.err.println("InterruptedException exception: " + ex.getMessage());
-//        } catch (URISyntaxException ex) {
-//            System.err.println("URISyntaxException exception: " + ex.getMessage());
-//        }
+
+        } catch (InterruptedException ex) {
+            System.err.println("InterruptedException exception: " + ex.getMessage());
+        } catch (URISyntaxException ex) {
+            System.err.println("URISyntaxException exception: " + ex.getMessage());
+        }
 
 
     }
