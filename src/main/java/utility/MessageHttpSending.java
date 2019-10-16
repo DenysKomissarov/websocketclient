@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 
-public class MessageSending {
+public class MessageHttpSending {
 
     private final String url = "http://localhost:8080/UIS/auth/registration";
 
