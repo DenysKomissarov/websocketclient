@@ -1,4 +1,4 @@
-package messages;
+package messages.webSocket;
 
 public enum SocketRoute {
 

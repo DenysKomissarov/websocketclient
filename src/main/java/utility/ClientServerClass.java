@@ -1,38 +1,47 @@
-//import com.neovisionaries.ws.client.WebSocket;
-//import com.neovisionaries.ws.client.WebSocketAdapter;
-//import com.neovisionaries.ws.client.WebSocketException;
-//import com.neovisionaries.ws.client.WebSocketFactory;
-//
-//import java.io.IOException;
-//import java.net.URI;
-//import java.net.URISyntaxException;
+package utility;
 
-import messages.webSocket.ClientBaseMsg;
-import messages.webSocket.ClientEventStateSMsg;
-import utility.ClientServerClass;
+import messages.http.CreateUserDto;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.util.LinkedList;
 
-public class TestApp {
-    private final static String denisId = "bed819ac-efe7-4cee-93a4-2752b7c6687f";
-    private final static String eventId = "03c9ef1e-9e65-4dd3-8cdf-8e465992ebd4";
+public class ClientServerClass {
+
+    private MessageSending messageSending = new MessageSending();
+
+    private final LinkedList<String> usersList = new LinkedList();
+
+
+    private final JSON json = new JSON() ;
 
 
 
-    public static void main(String[] args) {
+    public void saveUsersToDB(){
 
-        ClientEventStateSMsg message = new ClientEventStateSMsg();
+        long start = System.currentTimeMillis();
+        for (int i = 0; i <= 1; i++ ){
 
-        message.setNum(5);
-        printMessage(message);
+            CreateUserDto user = new CreateUserDto(i);
 
+            try {
+                String sJson = json.serialize(user);
+                String userId = messageSending.SendMessageToAnotherServer(sJson, "");
+                if (userId != null){
+                       usersList.add(userId);
+                }
+            } catch (IOException e) {
+                System.out.printf(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        long time = System.currentTimeMillis() - start;
 
+    }
 
-        ClientServerClass clientServer = new ClientServerClass();
-        clientServer.saveUsersToDB();
+    public void playEvent(){
 
-
-//        try {
+        try {
 //
 ////            // open websocket
 ////            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://localhost:8080/echo"));
@@ -57,11 +66,5 @@ public class TestApp {
 //            System.err.println("URISyntaxException exception: " + ex.getMessage());
 //        }
 
-
     }
-
-    public static void printMessage(ClientBaseMsg message){
-        System.out.println(message);
-    }
-
 }

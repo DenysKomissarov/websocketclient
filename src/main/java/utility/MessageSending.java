@@ -1,24 +1,26 @@
 package utility;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
+
 public class MessageSending {
 
+    private final String url = "http://localhost:8080/UIS/auth/registration";
 
-    public void SendMessageToAnotherServer(String json, String postfix)
+
+    public String SendMessageToAnotherServer(String json, String postfix)
             throws ClientProtocolException, IOException {
-
-
-        String url = "http://localhost:8080/UIS/auth/registration";
 
         CloseableHttpClient client = HttpClients.createDefault();
         try {
@@ -28,9 +30,22 @@ public class MessageSending {
             httpPost.setEntity(entity);
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
+            HttpResponse response = client.execute(httpPost);
 
-            CloseableHttpResponse response = client.execute(httpPost);
-            System.out.println("response: " + response);
+            HttpEntity httpEntity = response.getEntity();
+            String responseString = EntityUtils.toString(httpEntity, "UTF-8");
+            System.out.println(responseString);
+
+            String[] arr = responseString.split(",");
+            String[] subArr = arr[1].split(":");
+            if (subArr[0].equals("\"userId\"")){
+                return subArr[1].replace("\"}", "");
+            }
+            else{
+                return null;
+            }
+
+
         }catch(Exception ex){
             System.out.println(ex.getMessage());
         }
@@ -38,6 +53,7 @@ public class MessageSending {
             client.close();
         }
 
+        return null;
 
     }
 }

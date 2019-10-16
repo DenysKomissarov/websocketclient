@@ -1,4 +1,4 @@
-package messages;
+package messages.webSocket;
 
 public class ClientEventStateSMsg extends ClientBaseMsg {
 

@@ -1,4 +1,4 @@
-package messages;
+package messages.webSocket;
 
 public final class WebSocketMessages {
 
