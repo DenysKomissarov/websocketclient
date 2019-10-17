@@ -1,6 +1,8 @@
 package utility;
 
 import messages.http.CreateUserDto;
+import messages.http.GetEventDto;
+import messages.http.GetNewUserIdDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -11,8 +13,11 @@ public class ClientServerClass {
 
     private MessageHttpSending messageHttpSending = new MessageHttpSending();
     private MessageWebSocketSending messageWebSocketSending = new MessageWebSocketSending();
+    private String eventId = "";
 
     private final LinkedList<String> usersList = new LinkedList();
+
+    private final String mediaId = "";
 
 
     private final JSON json = new JSON() ;
@@ -24,14 +29,13 @@ public class ClientServerClass {
         long start = System.currentTimeMillis();
         for (int i = 0; i <= 1; i++ ){
 
-            CreateUserDto user = new CreateUserDto(i);
+            CreateUserDto userDto = new CreateUserDto(i);
 
             try {
-                String sJson = json.serialize(user);
-                String userId = messageHttpSending.SendMessageToAnotherServer(sJson, "");
-                if (userId != null){
-                       usersList.add(userId);
-                }
+                String sJson = json.serialize(userDto);
+                GetNewUserIdDto userWitId = (GetNewUserIdDto)messageHttpSending.SendPostMessageToAnotherServer(sJson, "/auth/registration", GetNewUserIdDto.class);
+                usersList.add(userWitId.userId);
+
             } catch (IOException e) {
                 System.out.printf(e.getMessage());
                 e.printStackTrace();
@@ -41,6 +45,45 @@ public class ClientServerClass {
 
     }
 
+    public void getEvent(){
+
+        long start = System.currentTimeMillis();
+        for (int i = 0; i <= 1; i++ ){
+
+            String userId = usersList.get(i);
+//            SetEventDto setEventDto = new SetEventDto(eventId, userId);
+
+            try {
+//                String sJson = json.serialize(user);
+                GetEventDto setEventDto = (GetEventDto)messageHttpSending.SendGetMessageToAnotherServer(String.format("/eventcrud/getevent/%s/%s", userId, eventId), GetEventDto.class );
+                System.out.println(setEventDto.eventId);
+
+            } catch (IOException e) {
+                System.out.printf(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        long time = System.currentTimeMillis() - start;
+
+    }
+
+    public void getPlaylists(){
+        long start = System.currentTimeMillis();
+        for (int i = 0; i <= 1; i++ ){
+
+            String userId = usersList.get(i);
+
+            try {
+                GetEventDto setEventDto = (GetEventDto)messageHttpSending.SendGetMessageToAnotherServer(String.format("/media/playlists/%s", mediaId), GetEventDto.class );
+                System.out.println(setEventDto.eventId);
+
+            } catch (IOException e) {
+                System.out.printf(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        long time = System.currentTimeMillis() - start;
+    }
     public void playEvent(){
 
 //        try {

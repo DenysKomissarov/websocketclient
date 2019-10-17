@@ -1,12 +1,12 @@
 
 
-public class ServerEndPlaylistSMsg extends BaseServerNotificationSMsg {
+public class ServerEndPlaylistSMsg /*extends BaseServerNotificationSMsg*/ {
 
     private String route = SocketRoute.PLAYLIST_END.getName();
 
     private String playlistId;
 
-    @Override
+//    @Override
     public String getRoute() {
         return route;
     }
