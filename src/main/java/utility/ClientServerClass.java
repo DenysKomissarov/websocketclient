@@ -1,9 +1,9 @@
 package utility;
 
+import config.PropertiesLoader;
 import messages.http.CreateUserDto;
 import messages.http.GetEventDto;
 import messages.http.GetNewUserIdDto;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,16 +13,21 @@ public class ClientServerClass {
 
     private MessageHttpSending messageHttpSending = new MessageHttpSending();
     private MessageWebSocketSending messageWebSocketSending = new MessageWebSocketSending();
-    private String eventId = "";
 
     private final LinkedList<String> usersList = new LinkedList();
 
-    private final String mediaId = "";
+    private String eventId_1;
+    private String mediaId;
+    private JSON json;
+    private PropertiesLoader propertiesLoader;
 
+    public ClientServerClass() {
+        this.propertiesLoader = new PropertiesLoader();
+        this.json = new JSON();
+        this.mediaId = propertiesLoader.getProperty("mediaId");
+        this.eventId_1 = propertiesLoader.getProperty("eventId_1");
 
-    private final JSON json = new JSON() ;
-
-
+    }
 
     public void saveUsersToDB(){
 
@@ -48,14 +53,10 @@ public class ClientServerClass {
     public void getEvent(){
 
         long start = System.currentTimeMillis();
-        for (int i = 0; i <= 1; i++ ){
-
-            String userId = usersList.get(i);
-//            SetEventDto setEventDto = new SetEventDto(eventId, userId);
+        for (String userId : usersList){
 
             try {
-//                String sJson = json.serialize(user);
-                GetEventDto setEventDto = (GetEventDto)messageHttpSending.SendGetMessageToAnotherServer(String.format("/eventcrud/getevent/%s/%s", userId, eventId), GetEventDto.class );
+                GetEventDto setEventDto = (GetEventDto)messageHttpSending.SendGetMessageToAnotherServer(String.format("/eventcrud/getevent/%s/%s", userId, eventId_1), GetEventDto.class );
                 System.out.println(setEventDto.eventId);
 
             } catch (IOException e) {
@@ -84,6 +85,26 @@ public class ClientServerClass {
         }
         long time = System.currentTimeMillis() - start;
     }
+
+    public void removeUsers(){
+
+        long start = System.currentTimeMillis();
+        for (String userId : usersList){
+
+            try {
+                GetEventDto setEventDto = (GetEventDto)messageHttpSending.SendGetMessageToAnotherServer(String.format("/auth/removeuser/%s", userId), GetEventDto.class );
+                System.out.println(setEventDto.eventId);
+
+            } catch (IOException e) {
+                System.out.printf(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        long time = System.currentTimeMillis() - start;
+
+    }
+
+
     public void playEvent(){
 
 //        try {

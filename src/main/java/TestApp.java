@@ -14,9 +14,6 @@ import utility.ClientServerClass;
 import java.net.URISyntaxException;
 
 public class TestApp {
-    private final static String denisId = "bed819ac-efe7-4cee-93a4-2752b7c6687f";
-    private final static String eventId = "03c9ef1e-9e65-4dd3-8cdf-8e465992ebd4";
-
 
 
     public static void main(String[] args) {
@@ -24,12 +21,14 @@ public class TestApp {
         ClientEventStateSMsg message = new ClientEventStateSMsg();
 
         message.setNum(5);
-        printMessage(message);
+//        printMessage(message);
 
 
 
         ClientServerClass clientServer = new ClientServerClass();
         clientServer.saveUsersToDB();
+        clientServer.getEvent();
+        clientServer.removeUsers();
 
 
 
@@ -62,10 +61,6 @@ public class TestApp {
 //        }
 
 
-    }
-
-    public static void printMessage(ClientBaseMsg message){
-        System.out.println(message);
     }
 
 }

@@ -1,5 +1,6 @@
 package utility;
 
+import config.PropertiesLoader;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -18,10 +20,18 @@ import java.io.IOException;
 
 public class MessageHttpSending {
 
-    private final String url = "http://localhost:8080/UIS";
 
-    private final JSON json = new JSON() ;
+//    private String url = "http://localhost:8080/UIS";
 
+    private PropertiesLoader propertiesLoader;
+    private JSON json;
+    private String url;
+
+    public MessageHttpSending() {
+        this.propertiesLoader = new PropertiesLoader();
+        this.json = new JSON();
+        this.url = propertiesLoader.getProperty("url");
+    }
 
     public Object SendPostMessageToAnotherServer(String json, String postfix, Class myClass)
             throws IOException {
@@ -60,6 +70,10 @@ public class MessageHttpSending {
             httpGet.setHeader("Accept", "application/json");
             httpGet.setHeader("Content-type", "application/json");
             HttpResponse response = client.execute(httpGet);
+
+            HttpEntity httpEntity = response.getEntity();
+            String responseString = EntityUtils.toString(httpEntity, "UTF-8");
+            System.out.println(responseString);
 
             return jsonToObject(response, myClass);
 
