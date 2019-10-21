@@ -71,9 +71,9 @@ public class MessageHttpSending {
             httpGet.setHeader("Content-type", "application/json");
             HttpResponse response = client.execute(httpGet);
 
-            HttpEntity httpEntity = response.getEntity();
-            String responseString = EntityUtils.toString(httpEntity, "UTF-8");
-            System.out.println(responseString);
+//            HttpEntity httpEntity = response.getEntity();
+//            String responseString = EntityUtils.toString(httpEntity, "UTF-8");
+//            System.out.println(responseString);
 
             return jsonToObject(response, myClass);
 

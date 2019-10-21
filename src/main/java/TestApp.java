@@ -28,6 +28,13 @@ public class TestApp {
         ClientServerClass clientServer = new ClientServerClass();
         clientServer.saveUsersToDB();
         clientServer.getEvent();
+        clientServer.bookEvent();
+        clientServer.getPlaylists();
+
+        clientServer.joinEvent();
+
+
+
         clientServer.removeUsers();
 
 
@@ -38,7 +45,7 @@ public class TestApp {
 //        try {
 //
 ////            // open websocket
-////            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://localhost:8080/echo"));
+//            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://localhost:8080/echo"));
 ////
 ////            TestMessageHandler messageHandler = new MessageHandlerImpl();
 ////
