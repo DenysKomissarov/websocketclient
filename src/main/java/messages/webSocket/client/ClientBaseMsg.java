@@ -1,19 +1,25 @@
-package messages.webSocket;
+package messages.webSocket.client;
 
+import messages.webSocket.SocketRoute;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 public class ClientBaseMsg {
 
+    @JsonProperty("event_id")
     private String eventId;
 
+    @JsonProperty("user_id")
     private String userId;
 
+//    @JsonProperty("route")
     private SocketRoute route;
 
+    @JsonProperty("user_time_stamp")
     private long userTimeStamp;
 
+    @JsonProperty("message_id")
     private String messageId;
 
-    private boolean isNeedConfirmation;
 
     public String getEventId() {
         return eventId;
@@ -55,23 +61,4 @@ public class ClientBaseMsg {
         this.messageId = messageId;
     }
 
-    public boolean isNeedConfirmation() {
-        return isNeedConfirmation;
-    }
-
-    public void setNeedConfirmation(boolean needConfirmation) {
-        isNeedConfirmation = needConfirmation;
-    }
-
-    @Override
-    public String toString() {
-        return "ClientBaseMsg{" +
-                "eventId='" + eventId + '\'' +
-                ", userId='" + userId + '\'' +
-                ", route=" + route +
-                ", userTimeStamp=" + userTimeStamp +
-                ", messageId='" + messageId + '\'' +
-                ", isNeedConfirmation=" + isNeedConfirmation +
-                '}';
-    }
 }

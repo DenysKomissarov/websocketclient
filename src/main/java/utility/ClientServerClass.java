@@ -36,7 +36,7 @@ public class ClientServerClass {
     public void saveUsersToDB(){
 
         long start = System.currentTimeMillis();
-        for (int i = 0; i <= 1; i++ ){
+        for (int i = 0; i < 1; i++ ){
 
             CreateUserDto userDto = new CreateUserDto(i);
 
@@ -99,8 +99,7 @@ public class ClientServerClass {
         for (String userId : usersList){
 
             try {
-                ResultStatus setEventDto = (ResultStatus)messageHttpSending.SendGetMessageToAnotherServer(String.format("/media/playlists/%s", mediaId), ResultStatus.class );
-                System.out.println(setEventDto.eventId);
+                messageHttpSending.SendGetMessageToAnotherServer(String.format("/media/playlists/%s", mediaId), ResultStatus.class );
 
             } catch (IOException e) {
                 System.out.printf(e.getMessage());
@@ -116,7 +115,7 @@ public class ClientServerClass {
         for (String userId : usersList){
 
             try {
-                Object setEventDto = (Object)messageHttpSending.SendGetMessageToAnotherServer(String.format("/auth/removeuser/%s", userId), Object.class );
+                messageHttpSending.SendGetMessageToAnotherServer(String.format("/auth/removeuser/%s", userId), Object.class );
 
             } catch (IOException e) {
                 System.out.printf(e.getMessage());
@@ -129,40 +128,55 @@ public class ClientServerClass {
 
     public void joinEvent(){
 
-        ExecutorService executorService = Executors.newFixedThreadPool(usersList.size());
+        if (usersList.size() > 0){
+
+            ExecutorService executorService = Executors.newFixedThreadPool(usersList.size());
+        }
         for (String userId : usersList){
-            executorService.submit(()->{
-                URI uri = null;
-                try {
-                    uri = new URI("ws://localhost:8080/echo");
 
-                    WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
+            URI uri = null;
+            try {
+                uri = new URI("ws://localhost:8080/echo");
+
+                WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
 
 
-                    TestMessageHandler messageHandler = new MessageHandlerImpl();
+                TestMessageHandler messageHandler = new MessageHandlerImpl();
 //
-                    // add listener
-                    clientEndPoint.addMessageHandler(messageHandler);
+                // add listener
+                clientEndPoint.addMessageHandler(messageHandler);
 
-                    clientEndPoint.sendMessage("{\"route\":\"clientAuth\", \"userId\":\"bba937ca-df26-4eff-8763-fad1cc6048c5\" , \"eventId\":\"6b53ea97-4d67-4aea-89e5-393c79756e33\"}");
+                //user join event
+                clientEndPoint.sendMessage("{\"route\":\"user_join_event\", \"user_id\":\"" + userId + "\", \"is_need_confirmation\":1, \"event_id\":\"" + eventId_1 +"\"}");
+//                //user join event confirm
+//                clientEndPoint.sendMessage("{\"route\":\"delivery_confirmation\", \"userId\":\"" + userId + "\" , \"eventId\":\"" + eventId_1 +"\", \"target_route\":\"user_join_event\"}");
+//
+//                //event_state
+//                clientEndPoint.sendMessage("{\"route\":\"event_state\", \"userId\":\"" + userId + "\" , \"eventId\":\"" + eventId_1 +"\"}");
+//                //user join event confirm
+//                clientEndPoint.sendMessage("{\"route\":\"delivery_confirmation\", \"userId\":\"" + userId + "\" , \"eventId\":\"" + eventId_1 +"\", \"target_route\":\"event_state\"}");
 
-                    for (int i = 0; i <= 300; i++){
-                        try {
 
-                            clientEndPoint.sendMessage("{\"route\":\"clientAuth\", \"userId\":\"bba937ca-df26-4eff-8763-fad1cc6048c5\" , \"eventId\":\"6b53ea97-4d67-4aea-89e5-393c79756e33\"}");
 
-                            Thread.sleep(1000);
+//                for (int i = 0; i <= 300; i++){
+//                    try {
+//
+//                        clientEndPoint.sendMessage("{\"route\":\"playlist_state\", \"userId\":\"" + userId +"\" , \"eventId\":\"" + eventId_1 + "\"}");
+//
+//                        Thread.sleep(1000);
+//
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
 
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-
-            });
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+//            executorService.submit(()->{
+//
+//
+//            });
         }
 
 

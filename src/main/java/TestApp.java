@@ -34,6 +34,11 @@ public class TestApp {
         clientServer.joinEvent();
 
 
+        try {
+            Thread.sleep(60000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         clientServer.removeUsers();
 
