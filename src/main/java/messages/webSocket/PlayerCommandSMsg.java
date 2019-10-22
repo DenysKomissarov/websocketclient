@@ -1,6 +1,7 @@
 package messages.webSocket;
 
-import com.uidance.enumeration.SocketPlaylistStatus;
+
+import entities.SocketPlaylistStatus;
 
 public class PlayerCommandSMsg extends BaseServerPlaylistStateSMsg {
 

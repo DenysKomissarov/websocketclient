@@ -7,8 +7,8 @@
 //import java.net.URI;
 //import java.net.URISyntaxException;
 
-import messages.webSocket.ClientBaseMsg;
-import messages.webSocket.ClientEventStateSMsg;
+
+import messages.webSocket.client.ClientEventStateSMsg;
 import utility.ClientServerClass;
 
 import java.net.URISyntaxException;
@@ -18,9 +18,6 @@ public class TestApp {
 
     public static void main(String[] args) {
 
-        ClientEventStateSMsg message = new ClientEventStateSMsg();
-
-        message.setNum(5);
 //        printMessage(message);
 
 
