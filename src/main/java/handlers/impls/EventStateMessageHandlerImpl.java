@@ -7,7 +7,7 @@ import utility.JSON;
 import java.util.Arrays;
 import java.util.List;
 
-public class  UserJoinMessageHandlerImpl implements TestMessageHandler {
+public class  EventStateMessageHandlerImpl implements TestMessageHandler {
 
     private ServerUserJoinEventSMsg responseMessage;
     public String messageId = "";

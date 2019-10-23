@@ -14,7 +14,6 @@ public class BaseServerSocketMsg {
 
     public BaseServerSocketMsg(String eventId) {
         this.eventId = eventId;
-        this.serverTimeStamp = System.currentTimeMillis();
     }
 
     public String getEventId() {

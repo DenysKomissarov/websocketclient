@@ -21,6 +21,11 @@ public class ServerUserJoinEventSMsg extends BaseServerNotificationSMsg {
         return route;
     }
 
+    @Override
+    public void setRoute(String route) {
+        this.route = route;
+    }
+
     public SocketUserModel getUser() {
         return user;
     }

@@ -22,8 +22,7 @@ public class ClientBaseMsg {
     @JsonProperty("message_id")
     private String messageId;
 
-    public ClientBaseMsg(String eventId) {
-        this.eventId = eventId;
+    public ClientBaseMsg() {
         this.userTimeStamp = System.currentTimeMillis();
         this.messageId = UUID.randomUUID().toString();
     }

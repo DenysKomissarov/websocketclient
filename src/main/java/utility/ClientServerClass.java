@@ -2,12 +2,16 @@ package utility;
 
 import config.PropertiesLoader;
 import handlers.TestMessageHandler;
-import handlers.impls.MessageHandlerImpl;
+import handlers.impls.EventStateMessageHandlerImpl;
+import handlers.impls.ServerStartEventHandlerImpl;
 import handlers.impls.UserJoinMessageHandlerImpl;
 import messages.http.*;
 import messages.webSocket.SocketRoute;
 import messages.webSocket.WebSocketMessages;
+import messages.webSocket.client.ClientDeliveryConfirmationSMsg;
 import messages.webSocket.client.ClientJoinEventSMsg;
+import messages.webSocket.client.ClientJoinPlaylistSMsg;
+import messages.webSocket.client.ClientPlaylistStateSMsg;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,6 +30,7 @@ public class ClientServerClass {
 
     private String eventId_1;
     private String mediaId;
+    private String playlistId;
     private JSON json;
     private PropertiesLoader propertiesLoader;
 
@@ -34,6 +39,7 @@ public class ClientServerClass {
         this.json = new JSON();
         this.mediaId = propertiesLoader.getProperty("mediaId");
         this.eventId_1 = propertiesLoader.getProperty("eventId_1");
+        this.eventId_1 = propertiesLoader.getProperty("playlistId");
 
     }
 
@@ -145,7 +151,7 @@ public class ClientServerClass {
                 WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
 
 
-                TestMessageHandler messageHandler = new UserJoinMessageHandlerImpl();
+                UserJoinMessageHandlerImpl messageHandler = new UserJoinMessageHandlerImpl();
 //
                 // add listener
                 clientEndPoint.addMessageHandler(messageHandler);
@@ -159,9 +165,105 @@ public class ClientServerClass {
 //                clientEndPoint.sendMessage("{\"route\":\"user_join_event\", \"user_id\":\"" + userId + "\", \"is_need_confirmation\":1, \"event_id\":\"" + eventId_1 +"\"}");
                 clientEndPoint.sendMessage(json.serialize(clientJoinEventSMsg));
 
-                while (messageHandler.equals("")){
+                while (messageHandler.messageId.equals("")){
+//                    System.out.println("wait");
 
                 }
+
+
+                ClientDeliveryConfirmationSMsg deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
+                deliveryConfirmationSMsg.setEventId(eventId_1);
+                deliveryConfirmationSMsg.setMessageId(messageHandler.messageId);
+                deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
+                deliveryConfirmationSMsg.setTargetMessageId(messageHandler.messageId);
+                deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_event);
+                deliveryConfirmationSMsg.setUserId(userId);
+
+                clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
+                messageHandler.messageId = "";
+
+//                ServerStartEventHandlerImpl serverStartEventHandler = new ServerStartEventHandlerImpl();
+//                clientEndPoint.addMessageHandler(serverStartEventHandler);
+
+
+                //eventState
+
+
+
+
+
+                //get media and go to player
+//                String playListId = "";
+//                try {
+//                    DtoMedia dtoMedia =  (DtoMedia)messageHttpSending.SendGetMessageToAnotherServer(String.format("/media/get?userId=%s&mediaId%s", userId, mediaId), DtoMedia.class );
+//                    if (dtoMedia != null){
+//                        playListId = dtoMedia.get
+//                    }
+//
+//                } catch (IOException e) {
+//                    System.out.printf(e.getMessage());
+//                e.printStackTrace();
+//                }
+
+
+
+                //join playlist
+
+                ClientJoinPlaylistSMsg clientJoinPlaylistSMsg = new ClientJoinPlaylistSMsg();
+                clientJoinPlaylistSMsg.setEventId(eventId_1);
+                clientJoinPlaylistSMsg.setNeedConfirmation(false);
+                clientJoinPlaylistSMsg.setPlaylistId(playlistId);
+                clientJoinPlaylistSMsg.setRoute(SocketRoute.user_join_playlist);
+                clientJoinPlaylistSMsg.setUserId(userId);
+
+                clientEndPoint.sendMessage(json.serialize(clientJoinPlaylistSMsg));
+
+                while (messageHandler.messageId.equals("")){
+//                    System.out.println("wait");
+
+                }
+
+                // confirm join playlist
+
+                deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
+                deliveryConfirmationSMsg.setEventId(eventId_1);
+                deliveryConfirmationSMsg.setMessageId(messageHandler.messageId);
+                deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
+                deliveryConfirmationSMsg.setTargetMessageId(messageHandler.messageId);
+                deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_playlist);
+                deliveryConfirmationSMsg.setUserId(userId);
+
+                clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
+
+
+
+                ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
+                clientPlaylistStateSMsg.setEventId(eventId_1);
+                clientPlaylistStateSMsg.setNeedConfirmation(false);
+                clientPlaylistStateSMsg.setPlaylistId(playlistId);
+                clientPlaylistStateSMsg.setRoute(SocketRoute.playlist_state);
+                clientPlaylistStateSMsg.setUserId(userId);
+
+                for (int i = 0; i <= 100; i++){
+                    try {
+
+                        clientEndPoint.sendMessage(json.serialize(clientPlaylistStateSMsg));
+
+                        Thread.sleep(1000);
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+//                EventStateMessageHandlerImpl eventStateMessageHandler = new EventStateMessageHandlerImpl();
+
+
+
+
+
+
 
 //                //user join event confirm
 //                clientEndPoint.sendMessage("{\"route\":\"delivery_confirmation\", \"userId\":\"" + userId + "\" , \"eventId\":\"" + eventId_1 +"\", \"target_route\":\"user_join_event\"}");
@@ -194,39 +296,6 @@ public class ClientServerClass {
 //            });
         }
 
-
-
     }
 
-
-
-
-    public void playEvent(){
-
-        try {
-//
-            // open websocket
-            final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(new URI("ws://localhost:8080/echo"));
-
-            TestMessageHandler messageHandler = new MessageHandlerImpl();
-
-            // add listener
-            clientEndPoint.addMessageHandler(messageHandler);
-
-            // send message to websocket
-            clientEndPoint.sendMessage("{\"route\":\"clientAuth\", \"userId\":\"bba937ca-df26-4eff-8763-fad1cc6048c5\" , \"eventId\":\"6b53ea97-4d67-4aea-89e5-393c79756e33\"}");
-
-
-
-            // wait 5 seconds for messages from websocket
-            Thread.sleep(5000);
-            clientEndPoint.sendMessage(WebSocketMessages.startMessage);
-
-        } catch (InterruptedException ex) {
-            System.err.println("InterruptedException exception: " + ex.getMessage());
-        } catch (URISyntaxException ex) {
-            System.err.println("URISyntaxException exception: " + ex.getMessage());
-        }
-
-    }
 }
