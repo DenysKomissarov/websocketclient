@@ -3,13 +3,17 @@ package utility;
 import config.PropertiesLoader;
 import handlers.TestMessageHandler;
 import handlers.impls.MessageHandlerImpl;
+import handlers.impls.UserJoinMessageHandlerImpl;
 import messages.http.*;
+import messages.webSocket.SocketRoute;
 import messages.webSocket.WebSocketMessages;
+import messages.webSocket.client.ClientJoinEventSMsg;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -141,13 +145,24 @@ public class ClientServerClass {
                 WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
 
 
-                TestMessageHandler messageHandler = new MessageHandlerImpl();
+                TestMessageHandler messageHandler = new UserJoinMessageHandlerImpl();
 //
                 // add listener
                 clientEndPoint.addMessageHandler(messageHandler);
 
                 //user join event
-                clientEndPoint.sendMessage("{\"route\":\"user_join_event\", \"user_id\":\"" + userId + "\", \"is_need_confirmation\":1, \"event_id\":\"" + eventId_1 +"\"}");
+                ClientJoinEventSMsg clientJoinEventSMsg = new ClientJoinEventSMsg();
+                clientJoinEventSMsg.setEventId(eventId_1);
+                clientJoinEventSMsg.setUserId(userId);
+                clientJoinEventSMsg.setNeedConfirmation(false);
+                clientJoinEventSMsg.setRoute(SocketRoute.user_join_event);
+//                clientEndPoint.sendMessage("{\"route\":\"user_join_event\", \"user_id\":\"" + userId + "\", \"is_need_confirmation\":1, \"event_id\":\"" + eventId_1 +"\"}");
+                clientEndPoint.sendMessage(json.serialize(clientJoinEventSMsg));
+
+                while (messageHandler.equals("")){
+
+                }
+
 //                //user join event confirm
 //                clientEndPoint.sendMessage("{\"route\":\"delivery_confirmation\", \"userId\":\"" + userId + "\" , \"eventId\":\"" + eventId_1 +"\", \"target_route\":\"user_join_event\"}");
 //

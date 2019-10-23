@@ -3,6 +3,8 @@ package messages.webSocket.client;
 import messages.webSocket.SocketRoute;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.UUID;
+
 public class ClientBaseMsg {
 
     @JsonProperty("event_id")
@@ -20,6 +22,11 @@ public class ClientBaseMsg {
     @JsonProperty("message_id")
     private String messageId;
 
+    public ClientBaseMsg(String eventId) {
+        this.eventId = eventId;
+        this.userTimeStamp = System.currentTimeMillis();
+        this.messageId = UUID.randomUUID().toString();
+    }
 
     public String getEventId() {
         return eventId;
