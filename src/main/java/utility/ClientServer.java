@@ -2,9 +2,7 @@ package utility;
 
 import config.PropertiesLoader;
 import handlers.TestMessageHandler;
-import handlers.impls.EventStateMessageHandlerImpl;
-import handlers.impls.ServerStartEventHandlerImpl;
-import handlers.impls.UserJoinMessageHandlerImpl;
+import handlers.impls.*;
 import messages.http.*;
 import messages.webSocket.SocketRoute;
 import messages.webSocket.WebSocketMessages;
@@ -16,37 +14,41 @@ import messages.webSocket.client.ClientPlaylistStateSMsg;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
-public class ClientServerClass {
+public class ClientServer {
 
     private MessageHttpSending messageHttpSending = new MessageHttpSending();
     private MessageWebSocketSending messageWebSocketSending = new MessageWebSocketSending();
 
     private final LinkedList<String> usersList = new LinkedList();
+    private ExecutorService executorService;
+
 
     private String eventId_1;
     private String mediaId;
     private String playlistId;
     private JSON json;
     private PropertiesLoader propertiesLoader;
+    private final long listenTime = 1 * 60 * 1000;
 
-    public ClientServerClass() {
+    public ClientServer() {
         this.propertiesLoader = new PropertiesLoader();
         this.json = new JSON();
         this.mediaId = propertiesLoader.getProperty("mediaId");
         this.eventId_1 = propertiesLoader.getProperty("eventId_1");
-        this.eventId_1 = propertiesLoader.getProperty("playlistId");
+        this.playlistId = propertiesLoader.getProperty("playlistId");
 
     }
 
     public void saveUsersToDB(){
 
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 1; i++ ){
+        for (int i = 0; i < 10; i++ ){
 
             CreateUserDto userDto = new CreateUserDto(i);
 
@@ -136,13 +138,13 @@ public class ClientServerClass {
 
     }
 
-    public void joinEvent(){
+    private Future<String> listenEvent(String userId){
 
-        if (usersList.size() > 0){
+        CompletableFuture<String> completableFuture
+                = new CompletableFuture<>();
 
-            ExecutorService executorService = Executors.newFixedThreadPool(usersList.size());
-        }
-        for (String userId : usersList){
+
+        executorService.submit(()->{
 
             URI uri = null;
             try {
@@ -151,7 +153,8 @@ public class ClientServerClass {
                 WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
 
 
-                UserJoinMessageHandlerImpl messageHandler = new UserJoinMessageHandlerImpl();
+//                UserJoinEventMessageHandlerImpl messageHandler = new UserJoinEventMessageHandlerImpl();
+                EventStartMessageHandlerImpl messageHandler = new EventStartMessageHandlerImpl();
 //
                 // add listener
                 clientEndPoint.addMessageHandler(messageHandler);
@@ -166,48 +169,58 @@ public class ClientServerClass {
                 clientEndPoint.sendMessage(json.serialize(clientJoinEventSMsg));
 
                 while (messageHandler.messageId.equals("")){
+                    Thread.sleep(100);
 //                    System.out.println("wait");
 
                 }
 
 
+                //confirmation user join event
+
+
                 ClientDeliveryConfirmationSMsg deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
                 deliveryConfirmationSMsg.setEventId(eventId_1);
-                deliveryConfirmationSMsg.setMessageId(messageHandler.messageId);
                 deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
                 deliveryConfirmationSMsg.setTargetMessageId(messageHandler.messageId);
                 deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_event);
                 deliveryConfirmationSMsg.setUserId(userId);
 
-                clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
                 messageHandler.messageId = "";
 
-//                ServerStartEventHandlerImpl serverStartEventHandler = new ServerStartEventHandlerImpl();
-//                clientEndPoint.addMessageHandler(serverStartEventHandler);
+
+                clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
 
 
-                //eventState
+                //waiting to event start
 
+//                EventStartMessageHandlerImpl eventStartMessageHandler = new EventStartMessageHandlerImpl();
 
+//                clientEndPoint.addMessageHandler(eventStartMessageHandler);
 
+                while (messageHandler.messageId.equals("") && !messageHandler.route.equals("event_start")){
+                    Thread.sleep(100);
+//                    System.out.println("wait");
 
+                }
 
-                //get media and go to player
-//                String playListId = "";
-//                try {
-//                    DtoMedia dtoMedia =  (DtoMedia)messageHttpSending.SendGetMessageToAnotherServer(String.format("/media/get?userId=%s&mediaId%s", userId, mediaId), DtoMedia.class );
-//                    if (dtoMedia != null){
-//                        playListId = dtoMedia.get
-//                    }
-//
-//                } catch (IOException e) {
-//                    System.out.printf(e.getMessage());
-//                e.printStackTrace();
-//                }
+                // confirm event start
+
+                deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
+                deliveryConfirmationSMsg.setEventId(eventId_1);
+                deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
+                deliveryConfirmationSMsg.setTargetMessageId(messageHandler.messageId);
+                deliveryConfirmationSMsg.setTargetRoute(SocketRoute.event_start);
+                deliveryConfirmationSMsg.setUserId(userId);
+
+                messageHandler.messageId = "";
+
+                clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
 
 
 
                 //join playlist
+
+//                UserJoinPlaylistMessageHandlerImpl userJoinPlaylistMessageHandler = new UserJoinPlaylistMessageHandlerImpl();
 
                 ClientJoinPlaylistSMsg clientJoinPlaylistSMsg = new ClientJoinPlaylistSMsg();
                 clientJoinPlaylistSMsg.setEventId(eventId_1);
@@ -216,22 +229,24 @@ public class ClientServerClass {
                 clientJoinPlaylistSMsg.setRoute(SocketRoute.user_join_playlist);
                 clientJoinPlaylistSMsg.setUserId(userId);
 
+//                clientEndPoint.addMessageHandler(userJoinPlaylistMessageHandler);
+
                 clientEndPoint.sendMessage(json.serialize(clientJoinPlaylistSMsg));
 
                 while (messageHandler.messageId.equals("")){
-//                    System.out.println("wait");
+                    Thread.sleep(100);
 
                 }
-
-                // confirm join playlist
-
+//
+//                // confirm join playlist
                 deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
                 deliveryConfirmationSMsg.setEventId(eventId_1);
-                deliveryConfirmationSMsg.setMessageId(messageHandler.messageId);
                 deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
                 deliveryConfirmationSMsg.setTargetMessageId(messageHandler.messageId);
                 deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_playlist);
                 deliveryConfirmationSMsg.setUserId(userId);
+
+                messageHandler.messageId = "";
 
                 clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
 
@@ -244,7 +259,8 @@ public class ClientServerClass {
                 clientPlaylistStateSMsg.setRoute(SocketRoute.playlist_state);
                 clientPlaylistStateSMsg.setUserId(userId);
 
-                for (int i = 0; i <= 100; i++){
+                long startTime = System.currentTimeMillis();
+                while ((System.currentTimeMillis() - startTime) < listenTime ){
                     try {
 
                         clientEndPoint.sendMessage(json.serialize(clientPlaylistStateSMsg));
@@ -256,46 +272,46 @@ public class ClientServerClass {
                     }
                 }
 
-
-//                EventStateMessageHandlerImpl eventStateMessageHandler = new EventStateMessageHandlerImpl();
-
-
-
-
-
-
-
-//                //user join event confirm
-//                clientEndPoint.sendMessage("{\"route\":\"delivery_confirmation\", \"userId\":\"" + userId + "\" , \"eventId\":\"" + eventId_1 +"\", \"target_route\":\"user_join_event\"}");
-//
-//                //event_state
-//                clientEndPoint.sendMessage("{\"route\":\"event_state\", \"userId\":\"" + userId + "\" , \"eventId\":\"" + eventId_1 +"\"}");
-//                //user join event confirm
-//                clientEndPoint.sendMessage("{\"route\":\"delivery_confirmation\", \"userId\":\"" + userId + "\" , \"eventId\":\"" + eventId_1 +"\", \"target_route\":\"event_state\"}");
-
-
-
-//                for (int i = 0; i <= 300; i++){
-//                    try {
-//
-//                        clientEndPoint.sendMessage("{\"route\":\"playlist_state\", \"userId\":\"" + userId +"\" , \"eventId\":\"" + eventId_1 + "\"}");
-//
-//                        Thread.sleep(1000);
-//
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+                System.out.println("listen finished");
+                clientEndPoint.sessionClose();
 
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
-//            executorService.submit(()->{
-//
-//
-//            });
-        }
+            completableFuture.complete("listen finished");
+            return null;
 
+        });
+
+        System.out.println("return");
+        return completableFuture;
     }
 
+    public void joinEvent(){
+
+        if (usersList.size() > 0){
+            executorService = Executors.newFixedThreadPool(usersList.size());
+
+            List<Future<String>> futures = new ArrayList<>();
+
+            for (String userId : usersList){
+
+                    futures.add(listenEvent(userId));
+
+            }
+
+            futures.forEach((f)-> {
+                try {
+                    String result = f.get();
+                    System.out.println(result);
+                    System.out.println("after future get");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            });
+
+        }
+    }
 }

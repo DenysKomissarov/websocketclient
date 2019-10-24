@@ -4,6 +4,7 @@ import handlers.TestMessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.websocket.*;
+import java.io.IOException;
 import java.net.URI;
 
 @ClientEndpoint
@@ -24,6 +25,14 @@ public class WebsocketClientEndpoint {
             container.connectToServer(this, endpointURI);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void sessionClose(){
+        try {
+            this.userSession.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
