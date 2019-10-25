@@ -22,8 +22,8 @@ public class TestApp {
         ClientServer clientServer = new ClientServer();
         clientServer.saveUsersToDB();
         clientServer.getEvent();
-        clientServer.bookEvent();
-        clientServer.getPlaylists();
+//        clientServer.bookEvent();
+//        clientServer.getPlaylists();
 
         clientServer.joinEvent();
         System.out.println("after join event");

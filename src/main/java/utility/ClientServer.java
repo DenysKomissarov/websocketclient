@@ -48,7 +48,7 @@ public class ClientServer {
     public void saveUsersToDB(){
 
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 10; i++ ){
+        for (int i = 0; i < 100; i++ ){
 
             CreateUserDto userDto = new CreateUserDto(i);
 
@@ -85,10 +85,10 @@ public class ClientServer {
 
     }
 
-    public void bookEvent(){
+    public void bookEvent(String userId){
 
-        long start = System.currentTimeMillis();
-        for (String userId : usersList){
+//        long start = System.currentTimeMillis();
+//        for (String userId : usersList){
 
             UserIdEventId userIdEventId = new UserIdEventId(userId, eventId_1);
             try {
@@ -101,8 +101,8 @@ public class ClientServer {
                 System.out.printf(e.getMessage());
 //                e.printStackTrace();
             }
-        }
-        long time = System.currentTimeMillis() - start;
+//        }
+//        long time = System.currentTimeMillis() - start;
 
     }
 
@@ -148,6 +148,7 @@ public class ClientServer {
 
             URI uri = null;
             try {
+                bookEvent(userId);
                 uri = new URI("ws://localhost:8080/echo");
 
                 WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
@@ -169,7 +170,7 @@ public class ClientServer {
                 clientEndPoint.sendMessage(json.serialize(clientJoinEventSMsg));
 
                 while (messageHandler.messageId.equals("")){
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
 //                    System.out.println("wait");
 
                 }
@@ -197,8 +198,8 @@ public class ClientServer {
 
 //                clientEndPoint.addMessageHandler(eventStartMessageHandler);
 
-                while (messageHandler.messageId.equals("") && !messageHandler.route.equals("event_start")){
-                    Thread.sleep(100);
+                while (!messageHandler.route.equals("event_start")){
+                    Thread.sleep(1000);
 //                    System.out.println("wait");
 
                 }
@@ -234,7 +235,7 @@ public class ClientServer {
                 clientEndPoint.sendMessage(json.serialize(clientJoinPlaylistSMsg));
 
                 while (messageHandler.messageId.equals("")){
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
 
                 }
 //
