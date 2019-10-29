@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientServer {
 
@@ -35,6 +36,7 @@ public class ClientServer {
     private JSON json;
     private PropertiesLoader propertiesLoader;
     private final long listenTime = 1 * 60 * 1000;
+    private AtomicInteger count = new AtomicInteger();
 
     public ClientServer() {
         this.propertiesLoader = new PropertiesLoader();
@@ -48,7 +50,7 @@ public class ClientServer {
     public void saveUsersToDB(){
 
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 100; i++ ){
+        for (int i = 200; i < 400; i++ ){
 
             CreateUserDto userDto = new CreateUserDto(i);
 
@@ -149,6 +151,7 @@ public class ClientServer {
             URI uri = null;
             try {
                 bookEvent(userId);
+                System.out.println("thread " + count.getAndIncrement());
                 uri = new URI("ws://localhost:8080/echo");
 
                 WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
@@ -169,11 +172,14 @@ public class ClientServer {
 //                clientEndPoint.sendMessage("{\"route\":\"user_join_event\", \"user_id\":\"" + userId + "\", \"is_need_confirmation\":1, \"event_id\":\"" + eventId_1 +"\"}");
                 clientEndPoint.sendMessage(json.serialize(clientJoinEventSMsg));
 
-                while (messageHandler.messageId.equals("")){
-                    Thread.sleep(1000);
+//                System.out.println("user join event send " +  userId);
+                while (!messageHandler.route.equals("user_join_event")){
+                    Thread.sleep(100);
 //                    System.out.println("wait");
 
                 }
+
+//                System.out.println("user join event received " +  userId);
 
 
                 //confirmation user join event
@@ -198,11 +204,13 @@ public class ClientServer {
 
 //                clientEndPoint.addMessageHandler(eventStartMessageHandler);
 
+//                System.out.println("event_start send " +  userId);
                 while (!messageHandler.route.equals("event_start")){
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
 //                    System.out.println("wait");
 
                 }
+//                System.out.println("event_start received " +  userId);
 
                 // confirm event start
 
@@ -235,7 +243,7 @@ public class ClientServer {
                 clientEndPoint.sendMessage(json.serialize(clientJoinPlaylistSMsg));
 
                 while (messageHandler.messageId.equals("")){
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
 
                 }
 //

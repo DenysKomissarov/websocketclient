@@ -25,7 +25,7 @@ public class EventStartMessageHandlerImpl implements TestMessageHandler {
 
     @Override
     public void handleMessage(String message) {
-        System.out.println("message from server\n" + message);
+//        System.out.println("message from server\n" + message);
 
 //        ServerUserJoinEventSMsg serverUserJoinEventSMsg = json.deSerialize(message, ServerUserJoinEventSMsg.class);
         List<String> list = Arrays.asList(message.split("\""));
