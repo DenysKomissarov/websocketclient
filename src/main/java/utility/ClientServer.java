@@ -192,7 +192,7 @@ public class ClientServer {
                 deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_event);
                 deliveryConfirmationSMsg.setUserId(userId);
 
-                messageHandler.messageId = "";
+//                messageHandler.messageId = "";
 
 
                 clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
@@ -221,7 +221,7 @@ public class ClientServer {
                 deliveryConfirmationSMsg.setTargetRoute(SocketRoute.event_start);
                 deliveryConfirmationSMsg.setUserId(userId);
 
-                messageHandler.messageId = "";
+//                messageHandler.messageId = "";
 
                 clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
 
@@ -255,7 +255,7 @@ public class ClientServer {
                 deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_playlist);
                 deliveryConfirmationSMsg.setUserId(userId);
 
-                messageHandler.messageId = "";
+//                messageHandler.messageId = "";
 
                 clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
 
