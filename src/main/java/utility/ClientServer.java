@@ -35,8 +35,9 @@ public class ClientServer {
     private String playlistId;
     private JSON json;
     private PropertiesLoader propertiesLoader;
-    private final long listenTime = 1 * 60 * 1000;
-    private AtomicInteger count = new AtomicInteger();
+    private final long listenTime = 3 * 60 * 1000;
+    public static AtomicInteger count = new AtomicInteger();
+    public static AtomicInteger confirmedEventStart = new AtomicInteger();
 
     public ClientServer() {
         this.propertiesLoader = new PropertiesLoader();
@@ -50,7 +51,7 @@ public class ClientServer {
     public void saveUsersToDB(){
 
         long start = System.currentTimeMillis();
-        for (int i = 200; i < 400; i++ ){
+        for (int i = 200; i < 401; i++ ){
 
             CreateUserDto userDto = new CreateUserDto(i);
 
@@ -151,7 +152,7 @@ public class ClientServer {
             URI uri = null;
             try {
                 bookEvent(userId);
-                System.out.println("thread " + count.getAndIncrement());
+//                System.out.println("thread " + count.getAndIncrement());
                 uri = new URI("ws://localhost:8080/echo");
 
                 WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
@@ -210,6 +211,8 @@ public class ClientServer {
 //                    System.out.println("wait");
 
                 }
+                System.out.println("confirmedEventStart: " + confirmedEventStart.incrementAndGet());
+
 //                System.out.println("event_start received " +  userId);
 
                 // confirm event start
@@ -242,7 +245,7 @@ public class ClientServer {
 
                 clientEndPoint.sendMessage(json.serialize(clientJoinPlaylistSMsg));
 
-                while (messageHandler.messageId.equals("")){
+                while (!messageHandler.route.equals("user_join_playlist")){
                     Thread.sleep(100);
 
                 }

@@ -2,6 +2,7 @@ package handlers.impls;
 
 import handlers.TestMessageHandler;
 import messages.webSocket.server.ServerUserJoinEventSMsg;
+import utility.ClientServer;
 import utility.JSON;
 
 import java.util.Arrays;
@@ -25,7 +26,7 @@ public class EventStartMessageHandlerImpl implements TestMessageHandler {
 
     @Override
     public void handleMessage(String message) {
-//        System.out.println("message from server\n" + message);
+        System.out.println("message from server\n" + message);
 
 //        ServerUserJoinEventSMsg serverUserJoinEventSMsg = json.deSerialize(message, ServerUserJoinEventSMsg.class);
         List<String> list = Arrays.asList(message.split("\""));
@@ -37,6 +38,9 @@ public class EventStartMessageHandlerImpl implements TestMessageHandler {
         int routeIndex = list.indexOf("route");
         if (routeIndex != -1){
             this.route = list.get(routeIndex + 2);
+            if (this.route.equals("event_start")){
+                System.out.println("thread " + ClientServer.count.getAndIncrement());
+            }
         }
 
 
