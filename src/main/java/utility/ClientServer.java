@@ -10,6 +10,11 @@ import messages.webSocket.client.ClientDeliveryConfirmationSMsg;
 import messages.webSocket.client.ClientJoinEventSMsg;
 import messages.webSocket.client.ClientJoinPlaylistSMsg;
 import messages.webSocket.client.ClientPlaylistStateSMsg;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.client.jetty.JettyWebSocketClient;
 
 import java.io.IOException;
 import java.net.URI;
@@ -51,7 +56,7 @@ public class ClientServer {
     public void saveUsersToDB(){
 
         long start = System.currentTimeMillis();
-        for (int i = 200; i < 401; i++ ){
+        for (int i = 1100; i < 1500; i++ ){
 
             CreateUserDto userDto = new CreateUserDto(i);
 
@@ -71,6 +76,15 @@ public class ClientServer {
 
     }
 
+//    private Future<String> addusers(String userId){
+//        CompletableFuture<String> completableFuture
+//                = new CompletableFuture<>();
+//        executorService.submit(()->{});
+//
+//        System.out.println("return addusers");
+//        return completableFuture;
+//    }
+
     public void getEvent(){
 
         long start = System.currentTimeMillis();
@@ -87,6 +101,15 @@ public class ClientServer {
         long time = System.currentTimeMillis() - start;
 
     }
+
+//    private Future<String> getEvents(String userId){
+//        CompletableFuture<String> completableFuture
+//                = new CompletableFuture<>();
+//        executorService.submit(()->{});
+//
+//        System.out.println("return addusers");
+//        return completableFuture;
+//    }
 
     public void bookEvent(String userId){
 
@@ -141,6 +164,7 @@ public class ClientServer {
 
     }
 
+
     private Future<String> listenEvent(String userId){
 
         CompletableFuture<String> completableFuture
@@ -151,18 +175,40 @@ public class ClientServer {
 
             URI uri = null;
             try {
+                System.out.println("before bookEvent");
                 bookEvent(userId);
+                System.out.println("after bookEvent");
 //                System.out.println("thread " + count.getAndIncrement());
-                uri = new URI("ws://localhost:8080/echo");
+//                uri = new URI("ws://localhost:8080/echo");
+//                uri = new URI("wss://uandidance-events.com/echo");
+                JettyWebSocketClient jettyWebSocketClient = new JettyWebSocketClient();
+                WebSocketHandlerImpl webSocketHandler = new WebSocketHandlerImpl();
+                jettyWebSocketClient.start();
+                jettyWebSocketClient.doHandshake(webSocketHandler, null, new URI("wss://uandidance-events.com/echo"));
 
-                WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
+                while (!webSocketHandler.isSucess){
+                    Thread.sleep(10);
+//                    System.out.println("wait");
+
+                }
+
+//                System.out.println("before connect");
+//                WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
+//                System.out.println("after connect");
 
 
 //                UserJoinEventMessageHandlerImpl messageHandler = new UserJoinEventMessageHandlerImpl();
-                EventStartMessageHandlerImpl messageHandler = new EventStartMessageHandlerImpl();
+//                EventStartMessageHandlerImpl messageHandler = new EventStartMessageHandlerImpl();
 //
                 // add listener
-                clientEndPoint.addMessageHandler(messageHandler);
+//                clientEndPoint.addMessageHandler(messageHandler);
+//
+//                while (!webSocketHandler.route.equals("user_join_event")){
+//                    Thread.sleep(10);
+////                    System.out.println("wait");
+//
+//                }
+
 
                 //user join event
                 ClientJoinEventSMsg clientJoinEventSMsg = new ClientJoinEventSMsg();
@@ -170,12 +216,12 @@ public class ClientServer {
                 clientJoinEventSMsg.setUserId(userId);
                 clientJoinEventSMsg.setNeedConfirmation(false);
                 clientJoinEventSMsg.setRoute(SocketRoute.user_join_event);
+                webSocketHandler.sendMessage(/*json.serialize(clientJoinEventSMsg)*/ new ObjectMapper().writeValueAsString(clientJoinEventSMsg));
 //                clientEndPoint.sendMessage("{\"route\":\"user_join_event\", \"user_id\":\"" + userId + "\", \"is_need_confirmation\":1, \"event_id\":\"" + eventId_1 +"\"}");
-                clientEndPoint.sendMessage(json.serialize(clientJoinEventSMsg));
-
+//                clientEndPoint.sendMessage(json.serialize(clientJoinEventSMsg));
 //                System.out.println("user join event send " +  userId);
-                while (!messageHandler.route.equals("user_join_event")){
-                    Thread.sleep(100);
+                while (!webSocketHandler.route.equals("user_join_event")){
+                    Thread.sleep(10);
 //                    System.out.println("wait");
 
                 }
@@ -189,14 +235,14 @@ public class ClientServer {
                 ClientDeliveryConfirmationSMsg deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
                 deliveryConfirmationSMsg.setEventId(eventId_1);
                 deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
-                deliveryConfirmationSMsg.setTargetMessageId(messageHandler.messageId);
+                deliveryConfirmationSMsg.setTargetMessageId(webSocketHandler.messageId);
                 deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_event);
                 deliveryConfirmationSMsg.setUserId(userId);
 
 //                messageHandler.messageId = "";
 
 
-                clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
+                webSocketHandler.sendMessage(json.serialize(deliveryConfirmationSMsg));
 
 
                 //waiting to event start
@@ -206,8 +252,8 @@ public class ClientServer {
 //                clientEndPoint.addMessageHandler(eventStartMessageHandler);
 
 //                System.out.println("event_start send " +  userId);
-                while (!messageHandler.route.equals("event_start")){
-                    Thread.sleep(100);
+                while (!webSocketHandler.route.equals("event_start")){
+                    Thread.sleep(10);
 //                    System.out.println("wait");
 
                 }
@@ -220,13 +266,13 @@ public class ClientServer {
                 deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
                 deliveryConfirmationSMsg.setEventId(eventId_1);
                 deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
-                deliveryConfirmationSMsg.setTargetMessageId(messageHandler.messageId);
+                deliveryConfirmationSMsg.setTargetMessageId(webSocketHandler.messageId);
                 deliveryConfirmationSMsg.setTargetRoute(SocketRoute.event_start);
                 deliveryConfirmationSMsg.setUserId(userId);
 
 //                messageHandler.messageId = "";
 
-                clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
+                webSocketHandler.sendMessage(json.serialize(deliveryConfirmationSMsg));
 
 
 
@@ -243,10 +289,10 @@ public class ClientServer {
 
 //                clientEndPoint.addMessageHandler(userJoinPlaylistMessageHandler);
 
-                clientEndPoint.sendMessage(json.serialize(clientJoinPlaylistSMsg));
+                webSocketHandler.sendMessage(json.serialize(clientJoinPlaylistSMsg));
 
-                while (!messageHandler.route.equals("user_join_playlist")){
-                    Thread.sleep(100);
+                while (!webSocketHandler.route.equals("user_join_playlist")){
+                    Thread.sleep(10);
 
                 }
 //
@@ -254,13 +300,13 @@ public class ClientServer {
                 deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
                 deliveryConfirmationSMsg.setEventId(eventId_1);
                 deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
-                deliveryConfirmationSMsg.setTargetMessageId(messageHandler.messageId);
+                deliveryConfirmationSMsg.setTargetMessageId(webSocketHandler.messageId);
                 deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_playlist);
                 deliveryConfirmationSMsg.setUserId(userId);
 
 //                messageHandler.messageId = "";
 
-                clientEndPoint.sendMessage(json.serialize(deliveryConfirmationSMsg));
+                webSocketHandler.sendMessage(json.serialize(deliveryConfirmationSMsg));
 
 
 
@@ -275,7 +321,7 @@ public class ClientServer {
                 while ((System.currentTimeMillis() - startTime) < listenTime ){
                     try {
 
-                        clientEndPoint.sendMessage(json.serialize(clientPlaylistStateSMsg));
+                        webSocketHandler.sendMessage(json.serialize(clientPlaylistStateSMsg));
 
                         Thread.sleep(1000);
 
@@ -285,7 +331,7 @@ public class ClientServer {
                 }
 
                 System.out.println("listen finished");
-                clientEndPoint.sessionClose();
+//                clientEndPoint.sessionClose();
 
             } catch (URISyntaxException e) {
                 e.printStackTrace();
