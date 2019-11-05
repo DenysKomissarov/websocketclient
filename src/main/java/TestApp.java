@@ -10,6 +10,9 @@
 
 import utility.ClientServer;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 public class TestApp {
 
 
@@ -19,17 +22,19 @@ public class TestApp {
 
 
 
+
         ClientServer clientServer = new ClientServer();
         clientServer.saveUsersToDB();
-        clientServer.getEvent();
-//        clientServer.bookEvent();
-//        clientServer.getPlaylists();
-
+        clientServer.getEvents();
+        clientServer.bookEvents();
         clientServer.joinEvent();
-        System.out.println("after join event");
+//        System.out.println("after join event");
 
 
-        clientServer.removeUsers();
+//        clientServer.removeUsers();
+
+//        clientServer.removeAllUsers();
+
 
     }
 
