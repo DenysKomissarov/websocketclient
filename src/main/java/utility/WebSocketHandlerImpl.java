@@ -23,8 +23,9 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     public String userId;
     public String playlistId;
     private JSON json;
-    private final long listenTime = 3 * 60 * 1000;
+//    private final long listenTime = 3 * 60 * 1000;
     private boolean isUserJoinEvent = false;
+    public boolean isReadyToStart = false;
     private MessageHttpSending messageHttpSending;
 
     public WebSocketHandlerImpl(String eventId, String userId, String playlistId){
@@ -47,7 +48,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
 
-        System.out.println("message from server\n" + webSocketMessage.getPayload());
+//        System.out.println("message from server\n" + webSocketMessage.getPayload());
 
 //        ServerUserJoinEventSMsg serverUserJoinEventSMsg = json.deSerialize(message, ServerUserJoinEventSMsg.class);
         List<String> list = Arrays.asList(webSocketMessage.getPayload().toString().split("\""));
@@ -78,6 +79,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
                 deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_event);
                 deliveryConfirmationSMsg.setUserId(userId);
                 sendMessage(json.serialize(deliveryConfirmationSMsg));
+
                 break;
             case  "event_start":
                 deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
@@ -100,6 +102,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
             case "user_join_playlist":
 
                 if (!isUserJoinEvent){
+                    System.out.println(" confirmedJoinPlaylist " + ClientServer.confirmedJoinPlaylist.incrementAndGet());
                     isUserJoinEvent = true;
                     deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
                     deliveryConfirmationSMsg.setEventId(this.eventId);
@@ -109,42 +112,44 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
                     deliveryConfirmationSMsg.setUserId(userId);
                     sendMessage(json.serialize(deliveryConfirmationSMsg));
 
-                    new Thread(()->{
-                        ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
-                        clientPlaylistStateSMsg.setEventId(this.eventId);
-                        clientPlaylistStateSMsg.setNeedConfirmation(false);
-                        clientPlaylistStateSMsg.setPlaylistId(playlistId);
-                        clientPlaylistStateSMsg.setRoute(SocketRoute.playlist_state);
-                        clientPlaylistStateSMsg.setUserId(userId);
+                    isReadyToStart = true;
 
-
-                        long startTime = System.currentTimeMillis();
-                        while ((System.currentTimeMillis() - startTime) < listenTime ){
-                            try {
-
-                                System.out.println("send user_join_playlist");
-                                sendMessage(json.serialize(clientPlaylistStateSMsg));
-
-                                Thread.sleep(1000);
-
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        try {
-                            messageHttpSending.SendGetMessageToAnotherServer(String.format("/auth/removeuser/%s", userId), Object.class );
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            try {
-                                socketSession.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                    }).run();
+//                    new Thread(()->{
+//                        ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
+//                        clientPlaylistStateSMsg.setEventId(this.eventId);
+//                        clientPlaylistStateSMsg.setNeedConfirmation(false);
+//                        clientPlaylistStateSMsg.setPlaylistId(playlistId);
+//                        clientPlaylistStateSMsg.setRoute(SocketRoute.playlist_state);
+//                        clientPlaylistStateSMsg.setUserId(userId);
+//
+//
+//                        long startTime = System.currentTimeMillis();
+//                        while ((System.currentTimeMillis() - startTime) < listenTime ){
+//                            try {
+//
+//                                System.out.println("send user_join_playlist");
+//                                sendMessage(json.serialize(clientPlaylistStateSMsg));
+//
+//                                Thread.sleep(1000);
+//
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        try {
+//                            messageHttpSending.SendGetMessageToAnotherServer(String.format("/auth/removeuser/%s", userId), Object.class );
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        } finally {
+//                            try {
+//                                socketSession.close();
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                    }).run();
 
                     break;
                 }
@@ -165,6 +170,14 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     @Override
     public boolean supportsPartialMessages() {
         return false;
+    }
+
+    public void connectionClose(){
+        try {
+            socketSession.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void sendMessage(String message) {

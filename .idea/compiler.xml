@@ -16,6 +16,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="syncrophone-uploader" options="-parameters" />
+      <module name="websocketclient" options="" />
     </option>
   </component>
 </project>

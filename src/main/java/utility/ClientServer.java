@@ -33,9 +33,6 @@ public class ClientServer {
 
     private final CopyOnWriteArrayList<String> usersList = new CopyOnWriteArrayList();
     private ExecutorService executorService;
-    private ExecutorService executorService1;
-    private ExecutorService executorService2;
-    private ExecutorService executorService3;
 
 
     private String eventId_1;
@@ -43,11 +40,13 @@ public class ClientServer {
     private String playlistId;
     private JSON json;
     private PropertiesLoader propertiesLoader;
-//    private final long listenTime = 3 * 60 * 1000;
+    private final long listenTime = 3 * 60 * 1000;
     public static AtomicInteger count = new AtomicInteger();
     public static AtomicInteger confirmedEventStart = new AtomicInteger();
+    public static AtomicInteger confirmedJoinPlaylist = new AtomicInteger();
+    public static AtomicInteger confirmedJoinEvent = new AtomicInteger();
     private String url;
-    private final int usersCount = 1;
+    private final int usersCount = 801;
 
     public ClientServer() {
         this.propertiesLoader = new PropertiesLoader();
@@ -143,7 +142,7 @@ public class ClientServer {
 
         long start = System.currentTimeMillis();
         if (usersList.size() > 0) {
-            executorService = Executors.newFixedThreadPool(usersList.size());
+//            executorService = Executors.newFixedThreadPool(usersList.size());
             List<Future<String>> futures = new ArrayList<>();
 
             for (String userId : usersList) {
@@ -203,7 +202,7 @@ public class ClientServer {
 
 //        long start = System.currentTimeMillis();
         if (usersList.size() > 0) {
-            executorService = Executors.newFixedThreadPool(usersList.size());
+//            executorService = Executors.newFixedThreadPool(usersList.size());
             List<Future<String>> futures = new ArrayList<>();
 
             for (String userId : usersList) {
@@ -288,7 +287,7 @@ public class ClientServer {
 
         long start = System.currentTimeMillis();
         if (usersList.size() > 0) {
-            executorService = Executors.newFixedThreadPool(usersList.size());
+//            executorService = Executors.newFixedThreadPool(usersList.size());
             List<Future<String>> futures = new ArrayList<>();
             for (String userId : usersList) {
 
@@ -347,7 +346,7 @@ public class ClientServer {
     public void joinEvent(){
 
         if (usersList.size() > 0){
-            executorService = Executors.newFixedThreadPool(usersList.size());
+//            executorService = Executors.newFixedThreadPool(usersList.size());
 
             List<Future<String>> futures = new ArrayList<>();
 
@@ -527,10 +526,10 @@ public class ClientServer {
 //
 //                webSocketHandler.sendMessage(json.serialize(clientJoinPlaylistSMsg));
 //
-//                while (!webSocketHandler.route.equals("user_join_playlist")){
-//                    Thread.sleep(10);
-//
-//                }
+                while (!webSocketHandler.isReadyToStart){
+                    Thread.sleep(10);
+
+                }
 ////
 ////                // confirm join playlist
 //                deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
@@ -546,26 +545,27 @@ public class ClientServer {
 //
 //
 //
-//                ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
-//                clientPlaylistStateSMsg.setEventId(eventId_1);
-//                clientPlaylistStateSMsg.setNeedConfirmation(false);
-//                clientPlaylistStateSMsg.setPlaylistId(playlistId);
-//                clientPlaylistStateSMsg.setRoute(SocketRoute.playlist_state);
-//                clientPlaylistStateSMsg.setUserId(userId);
+                ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
+                clientPlaylistStateSMsg.setEventId(eventId_1);
+                clientPlaylistStateSMsg.setNeedConfirmation(false);
+                clientPlaylistStateSMsg.setPlaylistId(playlistId);
+                clientPlaylistStateSMsg.setRoute(SocketRoute.playlist_state);
+                clientPlaylistStateSMsg.setUserId(userId);
 //
-//                long startTime = System.currentTimeMillis();
-//                while ((System.currentTimeMillis() - startTime) < listenTime ){
-//                    try {
-//
-//                        webSocketHandler.sendMessage(json.serialize(clientPlaylistStateSMsg));
-//
-//                        Thread.sleep(1000);
-//
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
+                long startTime = System.currentTimeMillis();
+                while ((System.currentTimeMillis() - startTime) < listenTime ){
+                    try {
+
+                        webSocketHandler.sendMessage(json.serialize(clientPlaylistStateSMsg));
+
+                        Thread.sleep(1000);
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                webSocketHandler.connectionClose();
+                messageHttpSending.SendGetMessageToAnotherServer(String.format("/auth/removeuser/%s", userId), Object.class );
 //                System.out.println("listen finished");
 ////                clientEndPoint.sessionClose();
 
@@ -642,7 +642,7 @@ public class ClientServer {
 
         });
 
-        System.out.println("return addusers");
+        System.out.println("return removeAllUser");
         return completableFuture;
     }
 }
