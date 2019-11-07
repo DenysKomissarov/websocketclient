@@ -90,6 +90,8 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
                 deliveryConfirmationSMsg.setUserId(userId);
                 sendMessage(json.serialize(deliveryConfirmationSMsg));
 
+                System.out.println(" event_start " + ClientServer.confirmedEventStart.incrementAndGet());
+
                 ClientJoinPlaylistSMsg clientJoinPlaylistSMsg = new ClientJoinPlaylistSMsg();
                 clientJoinPlaylistSMsg.setEventId(this.eventId);
                 clientJoinPlaylistSMsg.setNeedConfirmation(false);

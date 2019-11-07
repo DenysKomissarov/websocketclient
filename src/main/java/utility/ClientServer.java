@@ -46,7 +46,7 @@ public class ClientServer {
     public static AtomicInteger confirmedJoinPlaylist = new AtomicInteger();
     public static AtomicInteger confirmedJoinEvent = new AtomicInteger();
     private String url;
-    private final int usersCount = 801;
+    private final int usersCount = 800;
 
     public ClientServer() {
         this.propertiesLoader = new PropertiesLoader();
@@ -558,14 +558,19 @@ public class ClientServer {
 
                         webSocketHandler.sendMessage(json.serialize(clientPlaylistStateSMsg));
 
-                        Thread.sleep(1000);
+                        Thread.sleep(10000);
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
                 webSocketHandler.connectionClose();
-                messageHttpSending.SendGetMessageToAnotherServer(String.format("/auth/removeuser/%s", userId), Object.class );
+
+
+//                messageHttpSending.SendGetMessageToAnotherServer(String.format("/auth/removeuser/%s", userId), Object.class );
+
+
+
 //                System.out.println("listen finished");
 ////                clientEndPoint.sessionClose();
 
