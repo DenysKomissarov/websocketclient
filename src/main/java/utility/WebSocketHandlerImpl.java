@@ -63,7 +63,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
         if (routeIndex != -1){
             this.route = list.get(routeIndex + 2);
             if (this.route.equals("event_start")){
-                System.out.println("thread " + ClientServer.count.getAndIncrement());
+//                System.out.println("thread " + ClientServer.count.getAndIncrement());
             }
         }
 
