@@ -62,7 +62,8 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
         int routeIndex = list.indexOf("route");
         if (routeIndex != -1){
             this.route = list.get(routeIndex + 2);
-            if (this.route.equals("event_start")){
+            if (this.route.equals("playlist_state")){
+//                System.out.println("message from server\n" + webSocketMessage.getPayload());
 //                System.out.println("thread " + ClientServer.count.getAndIncrement());
             }
         }
@@ -103,8 +104,8 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
             break;
             case "user_join_playlist":
 
-                if (!isUserJoinEvent){
-                    System.out.println(" confirmedJoinPlaylist " + ClientServer.confirmedJoinPlaylist.incrementAndGet());
+//                if (!isUserJoinEvent){
+//                    System.out.println(" confirmedJoinPlaylist " + ClientServer.confirmedJoinPlaylist.incrementAndGet());
                     isUserJoinEvent = true;
                     deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
                     deliveryConfirmationSMsg.setEventId(this.eventId);
@@ -115,53 +116,15 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
                     sendMessage(json.serialize(deliveryConfirmationSMsg));
 
                     isReadyToStart = true;
-
-//                    new Thread(()->{
-//                        ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
-//                        clientPlaylistStateSMsg.setEventId(this.eventId);
-//                        clientPlaylistStateSMsg.setNeedConfirmation(false);
-//                        clientPlaylistStateSMsg.setPlaylistId(playlistId);
-//                        clientPlaylistStateSMsg.setRoute(SocketRoute.playlist_state);
-//                        clientPlaylistStateSMsg.setUserId(userId);
-//
-//
-//                        long startTime = System.currentTimeMillis();
-//                        while ((System.currentTimeMillis() - startTime) < listenTime ){
-//                            try {
-//
-//                                System.out.println("send user_join_playlist");
-//                                sendMessage(json.serialize(clientPlaylistStateSMsg));
-//
-//                                Thread.sleep(1000);
-//
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                        try {
-//                            messageHttpSending.SendGetMessageToAnotherServer(String.format("/auth/removeuser/%s", userId), Object.class );
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        } finally {
-//                            try {
-//                                socketSession.close();
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                    }).run();
-
                     break;
-                }
+//                }
         }
 
     }
 
     @Override
     public void handleTransportError(WebSocketSession webSocketSession, Throwable throwable) throws Exception {
-        System.out.println("Handle transport message" + throwable.getStackTrace());
+        System.out.println("Handle transport message" + throwable.getMessage());
     }
 
     @Override

@@ -46,7 +46,7 @@ public class ClientServer {
     public static AtomicInteger confirmedJoinPlaylist = new AtomicInteger();
     public static AtomicInteger confirmedJoinEvent = new AtomicInteger();
     private String url;
-    private final int usersCount = 1000;
+    private final int usersCount = 1800;
 
     public ClientServer() {
         this.propertiesLoader = new PropertiesLoader();
@@ -69,7 +69,7 @@ public class ClientServer {
 
             List<Future<String>> futures = new ArrayList<>();
 
-            for (int i = 0; i < usersCount; i++) {
+            for (int i = 1800; i < (usersCount + 900); i++) {
 
                 futures.add(adduser(i));
 
@@ -202,7 +202,7 @@ public class ClientServer {
 
 //        long start = System.currentTimeMillis();
         if (usersList.size() > 0) {
-//            executorService = Executors.newFixedThreadPool(usersList.size());
+//            executorService = Executors.newFixedThreadPool(sendMessageusersList.size());
             List<Future<String>> futures = new ArrayList<>();
 
             for (String userId : usersList) {
