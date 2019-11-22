@@ -24,7 +24,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     public String playlistId;
     private JSON json;
 //    private final long listenTime = 3 * 60 * 1000;
-    private boolean isUserJoinEvent = false;
+    private boolean isUserJoinPlaylist = false;
     public boolean isReadyToStart = false;
     private MessageHttpSending messageHttpSending;
 
@@ -48,7 +48,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
 
-//        System.out.println("message from server\n" + webSocketMessage.getPayload());
+        System.out.println("message from server\n" + webSocketMessage.getPayload());
 
 //        ServerUserJoinEventSMsg serverUserJoinEventSMsg = json.deSerialize(message, ServerUserJoinEventSMsg.class);
         List<String> list = Arrays.asList(webSocketMessage.getPayload().toString().split("\""));
@@ -104,9 +104,9 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
             break;
             case "user_join_playlist":
 
-//                if (!isUserJoinEvent){
+//                if (!isUserJoinPlaylist){
 //                    System.out.println(" confirmedJoinPlaylist " + ClientServer.confirmedJoinPlaylist.incrementAndGet());
-                    isUserJoinEvent = true;
+                isUserJoinPlaylist = true;
                     deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
                     deliveryConfirmationSMsg.setEventId(this.eventId);
                     deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
