@@ -26,6 +26,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
 //    private final long listenTime = 3 * 60 * 1000;
     private boolean isUserJoinPlaylist = false;
     public boolean isReadyToStart = false;
+    public boolean isError = false;
     private MessageHttpSending messageHttpSending;
 
     public WebSocketHandlerImpl(String eventId, String userId, String playlistId){
@@ -125,11 +126,14 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     @Override
     public void handleTransportError(WebSocketSession webSocketSession, Throwable throwable) throws Exception {
         System.out.println("Handle transport message" + throwable.getMessage());
+        isError = true;
+
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) throws Exception {
         System.out.println("Closed connection");
+        isError = true;
     }
 
     @Override

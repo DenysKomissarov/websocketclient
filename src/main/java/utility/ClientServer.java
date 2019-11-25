@@ -386,204 +386,9 @@ public class ClientServer {
 
         executorService.submit(()->{
 
-            URI uri = null;
-            try {
-//                System.out.println("before bookEvent");
-//                bookEvent(userId);
-//                System.out.println("after bookEvent");
-//                System.out.println("thread " + count.getAndIncrement());
-//                uri = new URI("ws://localhost:8080/echo");
-//                uri = new URI("wss://uandidance-events.com/echo");
-                JettyWebSocketClient jettyWebSocketClient = new JettyWebSocketClient();
-                WebSocketHandlerImpl webSocketHandler = new WebSocketHandlerImpl(eventId_1, userId, playlistId);
-                jettyWebSocketClient.start();
-                jettyWebSocketClient.doHandshake(webSocketHandler, null, new URI(url)).addCallback(new ListenableFutureCallback<WebSocketSession>() {
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        System.out.println("onFailure");
-                    }
 
-                    @Override
-                    public void onSuccess(WebSocketSession webSocketSession) {
-                        System.out.println("onSuccess");
-                        ClientJoinEventSMsg clientJoinEventSMsg = new ClientJoinEventSMsg();
-                        clientJoinEventSMsg.setEventId(eventId_1);
-                        clientJoinEventSMsg.setUserId(userId);
-                        clientJoinEventSMsg.setNeedConfirmation(false);
-                        clientJoinEventSMsg.setRoute(SocketRoute.user_join_event);
-                        try {
-                            webSocketHandler.sendMessage(/*json.serialize(clientJoinEventSMsg)*/ new ObjectMapper().writeValueAsString(clientJoinEventSMsg));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+            connectAndSend(userId, false);
 
-               /* while (!webSocketHandler.isSucess){
-                    Thread.sleep(10);
-//                    System.out.println("wait");
-                }*/
-
-
-//                System.out.println("before connect");
-//                WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(uri);
-//                System.out.println("after connect");
-
-
-//                UserJoinEventMessageHandlerImpl messageHandler = new UserJoinEventMessageHandlerImpl();
-//                EventStartMessageHandlerImpl messageHandler = new EventStartMessageHandlerImpl();
-//
-                // add listener
-//                clientEndPoint.addMessageHandler(messageHandler);
-//
-//                while (!webSocketHandler.route.equals("user_join_event")){
-//                    Thread.sleep(10);
-////                    System.out.println("wait");
-//
-//                }
-
-
-                //user join event
-                /*ClientJoinEventSMsg clientJoinEventSMsg = new ClientJoinEventSMsg();
-                clientJoinEventSMsg.setEventId(eventId_1);
-                clientJoinEventSMsg.setUserId(userId);
-                clientJoinEventSMsg.setNeedConfirmation(false);
-                clientJoinEventSMsg.setRoute(SocketRoute.user_join_event);
-                webSocketHandler.sendMessage(*//*json.serialize(clientJoinEventSMsg)*//* new ObjectMapper().writeValueAsString(clientJoinEventSMsg));
-*/
-
-
-//                clientEndPoint.sendMessage("{\"route\":\"user_join_event\", \"user_id\":\"" + userId + "\", \"is_need_confirmation\":1, \"event_id\":\"" + eventId_1 +"\"}");
-//                clientEndPoint.sendMessage(json.serialize(clientJoinEventSMsg));
-//                System.out.println("user join event send " +  userId);
-
-
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//                while (!webSocketHandler.route.equals("user_join_event")){
-//                    Thread.sleep(10);
-////                    System.out.println("wait");
-//
-//                }
-//
-////                System.out.println("user join event received " +  userId);
-//
-//
-//                //confirmation user join event
-//
-//
-//                ClientDeliveryConfirmationSMsg deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
-//                deliveryConfirmationSMsg.setEventId(eventId_1);
-//                deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
-//                deliveryConfirmationSMsg.setTargetMessageId(webSocketHandler.messageId);
-//                deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_event);
-//                deliveryConfirmationSMsg.setUserId(userId);
-//
-////                messageHandler.messageId = "";
-//
-//
-//                webSocketHandler.sendMessage(json.serialize(deliveryConfirmationSMsg));
-//
-//
-//                //waiting to event start
-//
-////                EventStartMessageHandlerImpl eventStartMessageHandler = new EventStartMessageHandlerImpl();
-//
-////                clientEndPoint.addMessageHandler(eventStartMessageHandler);
-//
-////                System.out.println("event_start send " +  userId);
-//                while (!webSocketHandler.route.equals("event_start")){
-//                    Thread.sleep(10);
-////                    System.out.println("wait");
-//
-//                }
-//                System.out.println("confirmedEventStart: " + confirmedEventStart.incrementAndGet());
-//
-////                System.out.println("event_start received " +  userId);
-//
-//                // confirm event start
-//
-//                deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
-//                deliveryConfirmationSMsg.setEventId(eventId_1);
-//                deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
-//                deliveryConfirmationSMsg.setTargetMessageId(webSocketHandler.messageId);
-//                deliveryConfirmationSMsg.setTargetRoute(SocketRoute.event_start);
-//                deliveryConfirmationSMsg.setUserId(userId);
-//
-////                messageHandler.messageId = "";
-//
-//                webSocketHandler.sendMessage(json.serialize(deliveryConfirmationSMsg));
-//
-//
-//
-//                //join playlist
-//
-////                UserJoinPlaylistMessageHandlerImpl userJoinPlaylistMessageHandler = new UserJoinPlaylistMessageHandlerImpl();
-//
-//                ClientJoinPlaylistSMsg clientJoinPlaylistSMsg = new ClientJoinPlaylistSMsg();
-//                clientJoinPlaylistSMsg.setEventId(eventId_1);
-//                clientJoinPlaylistSMsg.setNeedConfirmation(false);
-//                clientJoinPlaylistSMsg.setPlaylistId(playlistId);
-//                clientJoinPlaylistSMsg.setRoute(SocketRoute.user_join_playlist);
-//                clientJoinPlaylistSMsg.setUserId(userId);
-//
-////                clientEndPoint.addMessageHandler(userJoinPlaylistMessageHandler);
-//
-//                webSocketHandler.sendMessage(json.serialize(clientJoinPlaylistSMsg));
-//
-                while (!webSocketHandler.isReadyToStart){
-                    Thread.sleep(10);
-
-                }
-////
-////                // confirm join playlist
-//                deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
-//                deliveryConfirmationSMsg.setEventId(eventId_1);
-//                deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
-//                deliveryConfirmationSMsg.setTargetMessageId(webSocketHandler.messageId);
-//                deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_playlist);
-//                deliveryConfirmationSMsg.setUserId(userId);
-//
-////                messageHandler.messageId = "";
-//
-//                webSocketHandler.sendMessage(json.serialize(deliveryConfirmationSMsg));
-//
-//
-//
-                ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
-                clientPlaylistStateSMsg.setEventId(eventId_1);
-                clientPlaylistStateSMsg.setNeedConfirmation(false);
-                clientPlaylistStateSMsg.setPlaylistId(playlistId);
-                clientPlaylistStateSMsg.setRoute(SocketRoute.playlist_state);
-                clientPlaylistStateSMsg.setUserId(userId);
-//
-                long startTime = System.currentTimeMillis();
-                while ((System.currentTimeMillis() - startTime) < listenTime ){
-                    try {
-
-                        webSocketHandler.sendMessage(json.serialize(clientPlaylistStateSMsg));
-
-                        Thread.sleep(15000);
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                webSocketHandler.connectionClose();
-
-
-//                messageHttpSending.SendGetMessageToAnotherServer(String.format("/auth/removeuser/%s", userId), Object.class );
-
-
-
-//                System.out.println("listen finished");
-////                clientEndPoint.sessionClose();
-
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
             completableFuture.complete("listen finished listenEvent");
             return null;
 
@@ -591,6 +396,83 @@ public class ClientServer {
 
         System.out.println("return listenEvent");
         return completableFuture;
+    }
+
+
+    private void connectAndSend(String userId, boolean isReconnect){
+        try {
+
+            boolean isError = false;
+
+            JettyWebSocketClient jettyWebSocketClient = new JettyWebSocketClient();
+            WebSocketHandlerImpl webSocketHandler = new WebSocketHandlerImpl(eventId_1, userId, playlistId);
+            jettyWebSocketClient.start();
+            jettyWebSocketClient.doHandshake(webSocketHandler, null, new URI(url)).addCallback(new ListenableFutureCallback<WebSocketSession>() {
+                @Override
+                public void onFailure(Throwable throwable) {
+                    System.out.println("onFailure");
+                }
+
+                @Override
+                public void onSuccess(WebSocketSession webSocketSession) {
+                    System.out.println("onSuccess");
+                    ClientJoinEventSMsg clientJoinEventSMsg = new ClientJoinEventSMsg();
+                    clientJoinEventSMsg.setEventId(eventId_1);
+                    clientJoinEventSMsg.setUserId(userId);
+                    clientJoinEventSMsg.setNeedConfirmation(false);
+                    clientJoinEventSMsg.setRoute(SocketRoute.user_join_event);
+                    try {
+                        webSocketHandler.sendMessage(/*json.serialize(clientJoinEventSMsg)*/ new ObjectMapper().writeValueAsString(clientJoinEventSMsg));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+//
+            if (!isReconnect){
+
+                while (!webSocketHandler.isReadyToStart){
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
+            clientPlaylistStateSMsg.setEventId(eventId_1);
+            clientPlaylistStateSMsg.setNeedConfirmation(false);
+            clientPlaylistStateSMsg.setPlaylistId(playlistId);
+            clientPlaylistStateSMsg.setRoute(SocketRoute.playlist_state);
+            clientPlaylistStateSMsg.setUserId(userId);
+//
+            long startTime = System.currentTimeMillis();
+            while ((System.currentTimeMillis() - startTime) < listenTime ){
+                try {
+
+                    webSocketHandler.sendMessage(json.serialize(clientPlaylistStateSMsg));
+                    if (webSocketHandler.isError){
+                        isError = true;
+                        break;
+                    }
+                    Thread.sleep(15000);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (isError){
+                webSocketHandler.connectionClose();
+                connectAndSend(userId, true);
+            }
+            webSocketHandler.connectionClose();
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
 
