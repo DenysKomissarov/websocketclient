@@ -126,14 +126,14 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     @Override
     public void handleTransportError(WebSocketSession webSocketSession, Throwable throwable) throws Exception {
         System.out.println("Handle transport message" + throwable.getMessage());
-        isError = true;
+//        isError = true;
 
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) throws Exception {
         System.out.println("Closed connection");
-        isError = true;
+//        isError = true;
     }
 
     @Override

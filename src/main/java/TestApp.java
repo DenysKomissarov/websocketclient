@@ -24,16 +24,16 @@ public class TestApp {
 
 
         ClientServer clientServer = new ClientServer();
-//        clientServer.saveUsersToDB();
-//        clientServer.getEvents();
-//        clientServer.bookEvents();
-//        clientServer.joinEvent();
+        clientServer.saveUsersToDB();
+        clientServer.getEvents();
+        clientServer.bookEvents();
+        clientServer.joinEvent();
 //        System.out.println("after join event");
 
 
 //        clientServer.removeUsers();
 
-        clientServer.removeAllUsers();
+//        clientServer.removeAllUsers();
 
 
     }

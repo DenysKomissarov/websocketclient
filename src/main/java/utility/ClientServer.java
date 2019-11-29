@@ -46,7 +46,7 @@ public class ClientServer {
     public static AtomicInteger confirmedJoinPlaylist = new AtomicInteger();
     public static AtomicInteger confirmedJoinEvent = new AtomicInteger();
     private String url;
-    private final int usersCount = 1;
+    private final int usersCount = 5;
 
     public ClientServer() {
         this.propertiesLoader = new PropertiesLoader();
