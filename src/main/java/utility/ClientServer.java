@@ -46,7 +46,7 @@ public class ClientServer {
     public static AtomicInteger confirmedJoinPlaylist = new AtomicInteger();
     public static AtomicInteger confirmedJoinEvent = new AtomicInteger();
     private String url;
-    private final int usersCount = 5;
+    private final int usersCount = 1000;
 
     public ClientServer() {
         this.propertiesLoader = new PropertiesLoader();
@@ -387,7 +387,7 @@ public class ClientServer {
         executorService.submit(()->{
 
 
-            connectAndSend(userId, false);
+            connectAndSend(userId);
 
             completableFuture.complete("listen finished listenEvent");
             return null;
@@ -399,7 +399,7 @@ public class ClientServer {
     }
 
 
-    private void connectAndSend(String userId, boolean isReconnect){
+    private void connectAndSend(String userId){
         try {
 
             boolean isError = false;
@@ -429,8 +429,6 @@ public class ClientServer {
                 }
             });
 
-//
-            if (!isReconnect){
 
                 while (!webSocketHandler.isReadyToStart){
                     try {
@@ -440,7 +438,7 @@ public class ClientServer {
                     }
 
                 }
-            }
+//            }
 
             ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
             clientPlaylistStateSMsg.setEventId(eventId_1);
@@ -454,19 +452,11 @@ public class ClientServer {
                 try {
 
                     webSocketHandler.sendMessage(json.serialize(clientPlaylistStateSMsg));
-                    if (webSocketHandler.isError){
-                        isError = true;
-                        break;
-                    }
                     Thread.sleep(15000);
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
-            if (isError){
-                webSocketHandler.connectionClose();
-                connectAndSend(userId, true);
             }
             webSocketHandler.connectionClose();
 
