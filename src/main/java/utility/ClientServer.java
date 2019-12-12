@@ -1,17 +1,11 @@
 package utility;
 
 import config.PropertiesLoader;
-import handlers.TestMessageHandler;
-import handlers.impls.*;
 import messages.http.*;
 import messages.webSocket.SocketRoute;
-import messages.webSocket.WebSocketMessages;
-import messages.webSocket.client.ClientDeliveryConfirmationSMsg;
 import messages.webSocket.client.ClientJoinEventSMsg;
-import messages.webSocket.client.ClientJoinPlaylistSMsg;
 import messages.webSocket.client.ClientPlaylistStateSMsg;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.jetty.JettyWebSocketClient;
@@ -20,9 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,7 +27,7 @@ public class ClientServer {
     private ExecutorService executorService;
 
 
-    private String eventId_1;
+    private String eventId;
     private String mediaId;
     private String playlistId;
     private JSON json;
@@ -46,15 +38,20 @@ public class ClientServer {
     public static AtomicInteger confirmedJoinPlaylist = new AtomicInteger();
     public static AtomicInteger confirmedJoinEvent = new AtomicInteger();
     private String url;
-    private final int usersCount = 3000;
+    private int usersCount;
+    private int countFrom;
 
-    public ClientServer() {
+    public ClientServer(String usersCount, String countFrom, String eventId ) {
         this.propertiesLoader = new PropertiesLoader();
         this.json = new JSON();
         this.mediaId = propertiesLoader.getProperty("mediaId");
-        this.eventId_1 = propertiesLoader.getProperty("eventId_1");
+//        this.eventId = propertiesLoader.getProperty("eventId_1");
+        this.eventId = eventId;
         this.playlistId = propertiesLoader.getProperty("playlistId");
         this.url = propertiesLoader.getProperty("websocketUrl");
+        this.usersCount = Integer.parseInt(usersCount);
+        this.countFrom = Integer.parseInt(countFrom);
+
 
     }
 
@@ -69,7 +66,7 @@ public class ClientServer {
 
             List<Future<String>> futures = new ArrayList<>();
 
-            for (int i = 1800; i < (usersCount + 1800); i++) {
+            for (int i = countFrom; i < (usersCount + countFrom); i++) {
 
                 futures.add(adduser(i));
 
@@ -150,7 +147,7 @@ public class ClientServer {
                 futures.add(getEvent(userId));
 //
 //            try {
-//                messageHttpSending.SendGetMessageToAnotherServer(String.format("/eventcrud/getevent/%s/%s", userId, eventId_1), GetEventDto.class );
+//                messageHttpSending.SendGetMessageToAnotherServer(String.format("/eventcrud/getevent/%s/%s", userId, eventId), GetEventDto.class );
 //
 //            } catch (IOException e) {
 //                System.out.printf(e.getMessage());
@@ -180,7 +177,7 @@ public class ClientServer {
         executorService.submit(()->{
 
             try {
-                messageHttpSending.SendGetMessageToAnotherServer(String.format("/eventcrud/getevent/%s/%s", userId, eventId_1), GetEventDto.class );
+                messageHttpSending.SendGetMessageToAnotherServer(String.format("/eventcrud/getevent/%s/%s", userId, eventId), GetEventDto.class );
 
             } catch (IOException e) {
                 System.out.printf(e.getMessage());
@@ -209,7 +206,7 @@ public class ClientServer {
 
                 futures.add(bookEvent(userId));
 
-//            UserIdEventId userIdEventId = new UserIdEventId(userId, eventId_1);
+//            UserIdEventId userIdEventId = new UserIdEventId(userId, eventId);
 //            try {
 //
 //                String sJson = json.serialize(userIdEventId);
@@ -244,7 +241,7 @@ public class ClientServer {
                 = new CompletableFuture<>();
 
         executorService.submit(()->{
-            UserIdEventId userIdEventId = new UserIdEventId(userId, eventId_1);
+            UserIdEventId userIdEventId = new UserIdEventId(userId, eventId);
             try {
 
                 String sJson = json.serialize(userIdEventId);
@@ -405,7 +402,7 @@ public class ClientServer {
             boolean isError = false;
 
             JettyWebSocketClient jettyWebSocketClient = new JettyWebSocketClient();
-            WebSocketHandlerImpl webSocketHandler = new WebSocketHandlerImpl(eventId_1, userId, playlistId);
+            WebSocketHandlerImpl webSocketHandler = new WebSocketHandlerImpl(eventId, userId, playlistId);
             jettyWebSocketClient.start();
             jettyWebSocketClient.doHandshake(webSocketHandler, null, new URI(url)).addCallback(new ListenableFutureCallback<WebSocketSession>() {
                 @Override
@@ -417,7 +414,7 @@ public class ClientServer {
                 public void onSuccess(WebSocketSession webSocketSession) {
                     System.out.println("onSuccess");
                     ClientJoinEventSMsg clientJoinEventSMsg = new ClientJoinEventSMsg();
-                    clientJoinEventSMsg.setEventId(eventId_1);
+                    clientJoinEventSMsg.setEventId(eventId);
                     clientJoinEventSMsg.setUserId(userId);
                     clientJoinEventSMsg.setNeedConfirmation(false);
                     clientJoinEventSMsg.setRoute(SocketRoute.user_join_event);
@@ -441,7 +438,7 @@ public class ClientServer {
 //            }
 
             ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
-            clientPlaylistStateSMsg.setEventId(eventId_1);
+            clientPlaylistStateSMsg.setEventId(eventId);
             clientPlaylistStateSMsg.setNeedConfirmation(false);
             clientPlaylistStateSMsg.setPlaylistId(playlistId);
             clientPlaylistStateSMsg.setRoute(SocketRoute.playlist_state);
@@ -473,7 +470,7 @@ public class ClientServer {
 
         long start = System.currentTimeMillis();
 
-        executorService = Executors.newFixedThreadPool(usersCount);
+        executorService = Executors.newCachedThreadPool();
 
         List<Future<String>> futures = new ArrayList<>();
 
