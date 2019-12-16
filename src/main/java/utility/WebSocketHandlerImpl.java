@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class WebSocketHandlerImpl implements WebSocketHandler {
 
@@ -25,7 +26,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     private JSON json;
 //    private final long listenTime = 3 * 60 * 1000;
     private boolean isUserJoinPlaylist = false;
-    public boolean isReadyToStart = false;
+//    public boolean isReadyToStart = false;
     public boolean isError = false;
     private MessageHttpSending messageHttpSending;
 
@@ -92,7 +93,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
                 deliveryConfirmationSMsg.setUserId(userId);
                 sendMessage(json.serialize(deliveryConfirmationSMsg));
 
-                System.out.println(" event_start " + ClientServer.confirmedEventStart.incrementAndGet());
+//                System.out.println(" event_start " + ClientServer.confirmedEventStart.incrementAndGet());
 
                 ClientJoinPlaylistSMsg clientJoinPlaylistSMsg = new ClientJoinPlaylistSMsg();
                 clientJoinPlaylistSMsg.setEventId(this.eventId);
@@ -116,7 +117,11 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
                     deliveryConfirmationSMsg.setUserId(userId);
                     sendMessage(json.serialize(deliveryConfirmationSMsg));
 
-                    isReadyToStart = true;
+                    ClientServer.isReadyToStart = true;
+                    if (ClientServer.timer.get() == 0){
+                        ClientServer.timer = new AtomicLong(System.currentTimeMillis());
+                        System.out.println("timer = " + ClientServer.timer.get());
+                    }
                     break;
 //                }
         }

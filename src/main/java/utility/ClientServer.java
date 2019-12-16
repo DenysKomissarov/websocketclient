@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ClientServer {
 
@@ -25,6 +26,10 @@ public class ClientServer {
 
     private final CopyOnWriteArrayList<String> usersList = new CopyOnWriteArrayList();
     private ExecutorService executorService;
+
+
+    public static AtomicLong timer = new AtomicLong(0);
+    public static boolean isReadyToStart = false;
 
 
     private String eventId;
@@ -257,7 +262,7 @@ public class ClientServer {
 
         });
 
-        System.out.println("return addusers bookEvent");
+//        System.out.println("return addusers bookEvent");
         return completableFuture;
     }
 
@@ -347,6 +352,7 @@ public class ClientServer {
 
             List<Future<String>> futures = new ArrayList<>();
 
+            long userCount = 0;
             for (String userId : usersList){
                 try {
                     Thread.sleep(100);
@@ -354,7 +360,8 @@ public class ClientServer {
                     e.printStackTrace();
                 }
 
-                futures.add(listenEvent(userId));
+                futures.add(listenEvent(userId, userCount));
+                userCount++;
 
             }
 
@@ -375,7 +382,7 @@ public class ClientServer {
 
 
 
-    private Future<String> listenEvent(String userId){
+    private Future<String> listenEvent(String userId, long userCount){
 
         CompletableFuture<String> completableFuture
                 = new CompletableFuture<>();
@@ -384,7 +391,7 @@ public class ClientServer {
         executorService.submit(()->{
 
 
-            connectAndSend(userId);
+            connectAndSend(userId, userCount);
 
             completableFuture.complete("listen finished listenEvent");
             return null;
@@ -396,7 +403,7 @@ public class ClientServer {
     }
 
 
-    private void connectAndSend(String userId){
+    private void connectAndSend(String userId, long userCount){
         try {
 
             boolean isError = false;
@@ -425,16 +432,28 @@ public class ClientServer {
                     }
                 }
             });
-
-
-                while (!webSocketHandler.isReadyToStart){
+                while (!isReadyToStart && timer.get() == 0){
                     try {
+//                        System.out.println("System.currentTimeMillis() - timer.get(): " + (System.currentTimeMillis() - timer.get()));
+//                        System.out.println("userCount *10 " + (userCount *10));
                         Thread.sleep(10);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-
                 }
+
+            while ((System.currentTimeMillis() - timer.get()) <= (userCount *10)){
+                try {
+//                        System.out.println("System.currentTimeMillis() - timer.get(): " + (System.currentTimeMillis() - timer.get()));
+                        System.out.println("not ready");
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+//            System.out.println("!webSocketHandler.isReadyToStart && (System.currentTimeMillis() - timer.get()) <= (userCount *10) : "
+//                    + (!webSocketHandler.isReadyToStart && (System.currentTimeMillis() - timer.get()) <= (userCount *10)));
 //            }
 
             ClientPlaylistStateSMsg clientPlaylistStateSMsg = new ClientPlaylistStateSMsg();
@@ -449,7 +468,7 @@ public class ClientServer {
                 try {
 
                     webSocketHandler.sendMessage(json.serialize(clientPlaylistStateSMsg));
-                    Thread.sleep(15000);
+                    Thread.sleep(1500);
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
