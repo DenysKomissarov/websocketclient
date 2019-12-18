@@ -24,6 +24,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     public String userId;
     public String playlistId;
     private JSON json;
+    public boolean playlistState = true;
 //    private final long listenTime = 3 * 60 * 1000;
     private boolean isUserJoinPlaylist = false;
 //    public boolean isReadyToStart = false;
@@ -124,6 +125,9 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
                     }
                     break;
 //                }
+            case "playlist_state":
+                playlistState = true;
+                break;
         }
 
     }
