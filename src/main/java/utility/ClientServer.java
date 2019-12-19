@@ -442,7 +442,7 @@ public class ClientServer {
                     }
                 }
 
-            while ((System.currentTimeMillis() - timer.get()) <= (userCount *20)){
+            while ((System.currentTimeMillis() - timer.get()) <= (userCount *50)){
                 try {
 //                        System.out.println("System.currentTimeMillis() - timer.get(): " + (System.currentTimeMillis() - timer.get()));
                         System.out.println("not ready");
@@ -471,7 +471,7 @@ public class ClientServer {
                         webSocketHandler.playlistState = false;
                         webSocketHandler.sendMessage(json.serialize(clientPlaylistStateSMsg));
                     }
-                    Thread.sleep(1500);
+                    Thread.sleep(5000);
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
