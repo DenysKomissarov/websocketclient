@@ -86,13 +86,13 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
 
                 break;
             case  "event_start":
-                deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
-                deliveryConfirmationSMsg.setEventId(this.eventId);
-                deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
-                deliveryConfirmationSMsg.setTargetMessageId(targetMessageId);
-                deliveryConfirmationSMsg.setTargetRoute(SocketRoute.event_start);
-                deliveryConfirmationSMsg.setUserId(userId);
-                sendMessage(json.serialize(deliveryConfirmationSMsg));
+//                deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
+//                deliveryConfirmationSMsg.setEventId(this.eventId);
+//                deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
+//                deliveryConfirmationSMsg.setTargetMessageId(targetMessageId);
+//                deliveryConfirmationSMsg.setTargetRoute(SocketRoute.event_start);
+//                deliveryConfirmationSMsg.setUserId(userId);
+//                sendMessage(json.serialize(deliveryConfirmationSMsg));
 
 //                System.out.println(" event_start " + ClientServer.confirmedEventStart.incrementAndGet());
 

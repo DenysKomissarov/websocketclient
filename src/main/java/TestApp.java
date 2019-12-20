@@ -55,15 +55,11 @@ public class TestApp {
         }
 
 
-
-//
-//        clientServer = new ClientServer("800", "2400",  "30de8b3f-f440-4405-bff2-7daa42fad0e3");
+//        clientServer = new ClientServer("10", "0",  "d915981f-4d06-4d69-b1bf-90657280ae45");
 //        clientServer.saveUsersToDB();
 //        clientServer.getEvents();
 //        clientServer.bookEvents();
 //        clientServer.joinEvent();
-
-
     }
 
 }
