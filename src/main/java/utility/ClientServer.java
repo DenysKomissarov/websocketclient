@@ -442,7 +442,7 @@ public class ClientServer {
                     }
                 }
 
-            while ((System.currentTimeMillis() - timer.get()) <= (userCount *50)){
+            while ((System.currentTimeMillis() - timer.get()) <= (userCount *20)){
                 try {
 //                        System.out.println("System.currentTimeMillis() - timer.get(): " + (System.currentTimeMillis() - timer.get()));
                         System.out.println("not ready");

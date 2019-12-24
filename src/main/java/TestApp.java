@@ -55,7 +55,7 @@ public class TestApp {
         }
 
 
-//        clientServer = new ClientServer("10", "0",  "d915981f-4d06-4d69-b1bf-90657280ae45");
+//        clientServer = new ClientServer("300", "300",  "e44c7230-d6f1-43e6-b623-705b66594cf1");
 //        clientServer.saveUsersToDB();
 //        clientServer.getEvents();
 //        clientServer.bookEvents();

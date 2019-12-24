@@ -51,7 +51,7 @@ public class WebSocketHandlerImpl implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
 
-//        System.out.println("message from server\n" + webSocketMessage.getPayload());
+        System.out.println("message from server\n" + webSocketMessage.getPayload());
 
 //        ServerUserJoinEventSMsg serverUserJoinEventSMsg = json.deSerialize(message, ServerUserJoinEventSMsg.class);
         List<String> list = Arrays.asList(webSocketMessage.getPayload().toString().split("\""));
