@@ -79,14 +79,14 @@ public class ClientServer {
 
         if (usersList.size() > 0) {
 //            executorService = Executors.newFixedThreadPool(usersList.size());
-            executorService = Executors.newCachedThreadPool();
+//            executorService = Executors.newCachedThreadPool();
 
             List<Future<String>> futures = new ArrayList<>();
 
 
             for (String userId : usersList) {
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(20);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -269,7 +269,7 @@ public class ClientServer {
             for (int i = countFrom; i < (usersCount + countFrom); i++) {
 
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(30);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -395,7 +395,7 @@ public class ClientServer {
             for (String userId : usersList) {
 
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(20);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -524,8 +524,8 @@ public class ClientServer {
 
     public void removeAllUsers() {
 
-//        executorService = Executors.newCachedThreadPool();
-        executorService = Executors.newFixedThreadPool(1000);
+        executorService = Executors.newCachedThreadPool();
+//        executorService = Executors.newFixedThreadPool(1000);
 
         List<Future<String>> futures = new ArrayList<>();
 
