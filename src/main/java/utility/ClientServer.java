@@ -30,7 +30,8 @@ public class ClientServer {
     private Map<JettyWebSocketClient, WebSocketHandlerImpl> socketClientsMap = new ConcurrentHashMap<>();
 
 
-    private final CopyOnWriteArrayList<String> usersList = new CopyOnWriteArrayList();
+//    private CopyOnWriteArrayList<String> usersList = new CopyOnWriteArrayList();
+    private List<String> usersList = new ArrayList<>();
     private ExecutorService executorService;
 
     private JettyWebSocketClient jettyWebSocketClient;
@@ -84,15 +85,15 @@ public class ClientServer {
             List<Future<String>> futures = new ArrayList<>();
 
 
-            for (String userId : usersList) {
+            for (int i = 0; i <= usersCount; i++) {
                 try {
-                    Thread.sleep(20);
+                    Thread.sleep(12);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
                 System.out.println("usersList size: " + usersList.size());
-                futures.add(listenEvent(userId, userCount));
+                futures.add(listenEvent(usersList.get(i), userCount));
                 userCount++;
 
             }
@@ -215,7 +216,10 @@ public class ClientServer {
         webSocketHandler.socketSessionMap.forEach((k, v) -> {
             try {
                 k.close();
+                Thread.sleep(10);
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         });
@@ -390,16 +394,17 @@ public class ClientServer {
 //        long start = System.currentTimeMillis();
         if (usersList.size() > 0) {
 //            executorService = Executors.newFixedThreadPool(sendMessageusersList.size());
+            executorService = Executors.newCachedThreadPool();
             List<Future<String>> futures = new ArrayList<>();
 
-            for (String userId : usersList) {
+            for (int i = 0; i <= usersCount; i++) {
 
                 try {
-                    Thread.sleep(20);
+                    Thread.sleep(5);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                futures.add(bookEvent(userId));
+                futures.add(bookEvent( usersList.get(i)));
 
 //            UserIdEventId userIdEventId = new UserIdEventId(userId, eventId);
 //            try {
@@ -532,7 +537,7 @@ public class ClientServer {
         for (int i = 0; i <= usersCount; i++) {
 
             try {
-                Thread.sleep(20);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -582,6 +587,16 @@ public class ClientServer {
 
         System.out.println("return removeAllUser");
         return completableFuture;
+    }
+
+    public void getUsersId() {
+
+        try {
+            usersList = messageHttpSending.getUsersFromServer("/auth/gettestusers");
+            System.out.println("usersCount: " + usersList.size());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     //    private Future<String> listenEvent(String userId, long userCount) {

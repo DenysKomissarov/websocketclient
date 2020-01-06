@@ -94,13 +94,13 @@ public class WebSocketService {
 //                    System.out.println(" confirmedJoinPlaylist " + ClientServer.confirmedJoinPlaylist.incrementAndGet());
 //                isUserJoinPlaylist = true;
 
-                deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
-                deliveryConfirmationSMsg.setEventId(eventId);
-                deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
-                deliveryConfirmationSMsg.setTargetMessageId(targetMessageId);
-                deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_playlist);
-                deliveryConfirmationSMsg.setUserId(socketSessionMap.get(webSocketSession));
-                mainWebSocketHandler.sendMessage(webSocketSession, json.serialize(deliveryConfirmationSMsg));
+//                deliveryConfirmationSMsg = new ClientDeliveryConfirmationSMsg();
+//                deliveryConfirmationSMsg.setEventId(eventId);
+//                deliveryConfirmationSMsg.setRoute(SocketRoute.delivery_confirmation);
+//                deliveryConfirmationSMsg.setTargetMessageId(targetMessageId);
+//                deliveryConfirmationSMsg.setTargetRoute(SocketRoute.user_join_playlist);
+//                deliveryConfirmationSMsg.setUserId(socketSessionMap.get(webSocketSession));
+//                mainWebSocketHandler.sendMessage(webSocketSession, json.serialize(deliveryConfirmationSMsg));
 
                 try {
                     Thread.sleep(20);

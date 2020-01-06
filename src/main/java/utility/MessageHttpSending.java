@@ -12,10 +12,13 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class MessageHttpSending {
@@ -87,6 +90,33 @@ public class MessageHttpSending {
         return null;
     }
 
+    public List<String> getUsersFromServer( String postfix)
+            throws IOException {
+
+        CloseableHttpClient client = HttpClients.createDefault();
+        try {
+            HttpGet httpGet = new HttpGet(url + postfix);
+
+            httpGet.setHeader("Accept", "application/json");
+            httpGet.setHeader("Content-type", "application/json");
+            HttpResponse response = client.execute(httpGet);
+
+//            HttpEntity httpEntity = response.getEntity();
+//            String responseString = EntityUtils.toString(httpEntity, "UTF-8");
+//            System.out.println(responseString);
+
+            return jsonList(response);
+
+        }catch(Exception ex){
+            System.out.println(ex.getMessage());
+        }
+        finally {
+            client.close();
+        }
+
+        return null;
+    }
+
 
     private Object jsonToObject(HttpResponse response, Class myClass){
 
@@ -105,6 +135,40 @@ public class MessageHttpSending {
             System.out.println(responseString);
 
             return json.deSerialize(responseString, myClass);
+        }
+        else{
+            return null;
+        }
+
+    }
+
+    private List<String> jsonList(HttpResponse response){
+
+
+        int status = response.getStatusLine().getStatusCode();
+
+
+        if (status == 200){
+            HttpEntity httpEntity = response.getEntity();
+            String responseString = null;
+            try {
+                responseString = EntityUtils.toString(httpEntity, "UTF-8");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println(responseString);
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            // 2. convert JSON array to List of objects
+            try {
+                List<String> users = Arrays.asList(mapper.readValue(responseString, String[].class));
+                return users;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
         }
         else{
             return null;

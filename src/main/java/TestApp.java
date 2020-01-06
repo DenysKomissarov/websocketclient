@@ -27,12 +27,14 @@ public class TestApp {
             clientServer = new ClientServer(args[0], args[1],  args[2]);
 
             try {
-                clientServer.saveUsersToDB();
+//                clientServer.saveUsersToDB();
 //                Thread.sleep(30000);
 //
 //                clientServer.getEvents();
 
-                Thread.sleep(10000);
+//                Thread.sleep(10000);
+
+                clientServer.getUsersId();
 
                 clientServer.bookEvents();
 
@@ -69,7 +71,10 @@ public class TestApp {
 
 //        clientServer.removeUsers();
 
-        } else if (args.length >= 1 && args[0] != null) {
+        } else if (args.length == 2 && args[0] != null && args[1] != null) {
+            clientServer = new ClientServer(args[0], args[1], "");
+            clientServer.saveUsersToDB();
+        } else if (args.length == 1 && args[0] != null) {
             clientServer = new ClientServer(args[0], "0", "");
             clientServer.removeAllUsers();
         } else {
@@ -79,8 +84,9 @@ public class TestApp {
 
 
 //        clientServer = new ClientServer("10", "0",  "44c82713-1ced-4f74-896a-76c368b8542d");
+//        clientServer.getUsersId();
 //        clientServer.saveUsersToDB();
-////        clientServer.getEvents();
+//        clientServer.getEvents();
 //        clientServer.bookEvents();
 //        clientServer.joinEvent();
 //        clientServer.startAllUsersToGetPlaylistState();
